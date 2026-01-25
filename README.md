@@ -14,7 +14,6 @@ purchases and sales. It is a web-based application implemented using PHP with My
 6. Create a new database called 'pharmacy' in phpmyadmin.
 7. Import the file 'pharmacy.sql' into the database.
 
-## Launch
 
 1. After successfully importing, start the project by typing the following in the web browser:  *localhost/PHARMACY/mainpage.php*   
 2. The Login Page for Admin opens up by default. Login as Admin by using:
