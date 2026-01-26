@@ -51,7 +51,7 @@ Customers
 
 	<?php
 	
-		include "config.php";
+		include "./config/config.php";
 		session_start();
 		
 		$sql="SELECT E_FNAME from EMPLOYEE WHERE E_ID='$_SESSION[user]'";

@@ -2,7 +2,7 @@
 <html>
 
 <head>
-<link rel="stylesheet" type="text/css" href="login1.css">
+<link rel="stylesheet" type="text/css" href="../../assets/css/login.css">
 <div class="header">
 <h1>Login </h1>
 <p style="margin-top:-20px;line-height:1;font-size:30px;">Pharmacy Management System</p>
@@ -18,7 +18,7 @@ pharmacy
 	<div class="container">
 		<form method="post" action="">
 			<div id="div_login">
-				<h1>Pharmacist Login</h1>
+				<h1> Login</h1>
 				<center>
 				<div>
 					<input type="text" class="textbox" id="uname" name="uname" placeholder="Username" />
@@ -27,13 +27,12 @@ pharmacy
 					<input type="password" class="textbox" id="pwd" name="pwd" placeholder="Password"/>
 				</div>
 				<div>
-					<input type="submit" value="Submit" name="submit" id="submit" />
-					<input type="submit" value="Click here for Admin Login" name="psubmit" id="submit" />
+					<input type="submit" value="Login" name="submit" id="submit" />
 				</div>
 			 
 				
 	<?php
-include "config.php";
+include "../../config/config.php";
 
 if(isset($_POST['submit'])){
 
@@ -60,10 +59,10 @@ if(isset($_POST['submit'])){
 
             // Redirect based on role
             if($role == "pharmacist"){
-                header("location:pharmmainpage.php");
+                header("location:../pharmacist/dashboard.php");
                 exit();
             } elseif($role == "admin") {
-                header("location:adminmainpage.php");
+                header("location:../admin/dashboard.php");
                 exit();
             } else {
                 echo "<p style='color:red;'>Unknown role!</p>";

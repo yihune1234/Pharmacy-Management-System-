@@ -4,15 +4,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="table1.css">
-<link rel="stylesheet" type="text/css" href="nav2.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/table.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
 <title>Medicines</title>
 </head>
 
 <body>
 
 	<?php 
-require('./admin_sidebar.php');
+require('../sidebar.php');
 ?>
 	<center>
 	<div class="head">
@@ -32,7 +32,7 @@ require('./admin_sidebar.php');
 		</tr>
 	
 	<?php
-	include "config.php";
+	include "../../../config/config.php";
 	
 		$sql = "SELECT med_id, med_name,med_qty,category,med_price,location_rack FROM meds";
 		$result = $conn->query($sql);
@@ -49,9 +49,9 @@ require('./admin_sidebar.php');
 			echo "<td>" . $row["location_rack"]. "</td>";
 			echo "<td align=center>";
 						 
-				echo "<a class='button1 edit-btn' href=inventory-update.php?id=".$row['med_id'].">Edit</a>";
+				echo "<a class='button1 edit-btn' href=update.php?id=".$row['med_id'].">Edit</a>";
 			
-				echo "<a class='button1 del-btn' href=inventory-delete.php?id=".$row['med_id'].">Delete</a>";
+				echo "<a class='button1 del-btn' href=delete.php?id=".$row['med_id'].">Delete</a>";
 				
 			echo "</td>";
 		echo "</tr>";

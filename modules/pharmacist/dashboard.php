@@ -2,8 +2,8 @@
 <html>
 
 <head>
-<link rel="stylesheet" type="text/css" href="table1.css">
-<link rel="stylesheet" type="text/css" href="nav2.css">
+<link rel="stylesheet" type="text/css" href="../../assets/css/table.css">
+<link rel="stylesheet" type="text/css" href="../../assets/css/nav.css">
 <title>
 Pharmacist Dashboard
 </title>
@@ -16,22 +16,22 @@ body {font-family:Arial;}
 
 	<div class="sidenav">
 			<h2 style="font-family:Arial; color:white; text-align:center;"> PHARMACIA </h2>
-			<a href="pharmmainpage.php">Dashboard</a>
+			<a href="dashboard.php">Dashboard</a>
 			
-			<a href="pharm-inventory.php">View Inventory</a>
-			<a href="pharm-pos1.php">Add New Sale</a>
+			<a href="inventory/view.php">View Inventory</a>
+			<a href="sales/pos1.php">Add New Sale</a>
 			<button class="dropdown-btn">Customers
 			<i class="down"></i>
 			</button>
 			<div class="dropdown-container">
-				<a href="pharm-customer.php">Add New Customer</a>
-				<a href="pharm-customer-view.php">View Customers</a>
+				<a href="customers/add.php">Add New Customer</a>
+				<a href="customers/view.php">View Customers</a>
 			</div>
 	</div>
 	
 	<?php
 	
-	include "config.php";
+	include "../../config/config.php";
 	session_start();
 	
 	$sql="SELECT E_FNAME from EMPLOYEE WHERE E_ID='$_SESSION[user]'";
@@ -43,7 +43,7 @@ body {font-family:Arial;}
 	?>
 
 	<div class="topnav">
-		<a href="logout1.php">Logout(signed in as <?php echo $ename; ?>)</a>
+		<a href="../auth/logout.php">Logout(signed in as <?php echo $ename; ?>)</a>
 	</div>
 	
 	<center>
@@ -52,12 +52,12 @@ body {font-family:Arial;}
 	</div>
 	</center>
 	
-	<a href="pharm-pos1.php" title="Add New Sale">
-	<img src="carticon1.png" style="padding:8px;margin-left:550px;margin-top:40px;width:200px;height:200px;border:2px solid black;" alt="Add New Sale">
+	<a href="sales/pos1.php" title="Add New Sale">
+	<img src="../../assets/images/admin/carticon1.png" style="padding:8px;margin-left:550px;margin-top:40px;width:200px;height:200px;border:2px solid black;" alt="Add New Sale">
 	</a>
 	
-	<a href="pharm-inventory.php" title="View Inventory">
-	<img src="inventory.png" style="padding:8px;margin-left:100px;margin-top:40px;width:200px;height:200px;border:2px solid black;" alt="Inventory">
+	<a href="inventory/view.php" title="View Inventory">
+	<img src="../../assets/images/common/inventory.png" style="padding:8px;margin-left:100px;margin-top:40px;width:200px;height:200px;border:2px solid black;" alt="Inventory">
 	</a>
 	
 </body>
