@@ -115,19 +115,23 @@
                     <thead>
                         <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                             <th class="px-8 py-4">S-ID</th>
-                            <th class="px-8 py-4">C-ID</th>
+                            <th class="px-8 py-4">Customer Name</th>
                             <th class="px-8 py-4 text-right">Amount (Rs)</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">
                         <?php
-                        $sql = "SELECT sale_id, c_id, total_amt FROM sales WHERE s_date >= '$start' AND s_date <= '$end';";
+                        $sql = "SELECT s.sale_id, s.total_amt, c.C_Fname, c.C_Lname 
+                                FROM sales s 
+                                JOIN customer c ON s.c_id = c.C_ID 
+                                WHERE s.s_date >= '$start' AND s.s_date <= '$end';";
                         $result = $conn->query($sql);
                         if ($result && $result->num_rows > 0) {
                             while($row = $result->fetch_assoc()) {
+                                $name = $row['C_Fname'] . " " . $row['C_Lname'];
                                 echo "<tr class='hover:bg-slate-50/50 transition-colors'>";
-                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-400'>#".$row["sale_id"]."</td>";
-                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-900'>#".$row["c_id"]."</td>";
+                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-400'>#".str_pad($row["sale_id"], 5, '0', STR_PAD_LEFT)."</td>";
+                                echo "<td class='px-8 py-4 text-xs font-black text-slate-900'>".$name."</td>";
                                 echo "<td class='px-8 py-4 text-xs font-black text-blue-600 text-right'>".number_format($row["total_amt"], 2)."</td>";
                                 echo "</tr>";
                             }

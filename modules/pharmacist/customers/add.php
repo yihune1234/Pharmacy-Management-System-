@@ -1,120 +1,122 @@
+<?php
+require_once __DIR__ . '/../../../config/config.php';
+require_once __DIR__ . '/../../../includes/alerts.php';
+
+if (isset($_POST['add'])) {
+    $fname = $conn->real_escape_string($_POST['cfname']);
+    $lname = $conn->real_escape_string($_POST['clname']);
+    $age   = (int)$_POST['age'];
+    $sex   = $conn->real_escape_string($_POST['sex']);
+    $phno  = $conn->real_escape_string($_POST['phno']);
+    $mail  = $conn->real_escape_string($_POST['emid']);
+
+    if (empty($fname) || $sex == "selected") {
+        set_flash_message("Please provide at least a name and gender.", "warning");
+    } else {
+        $gender_code = ($sex == 'Male') ? 'M' : (($sex == 'Female') ? 'F' : 'M'); // Defaulting Others to M or we could add it to ENUM
+        
+        $sql = "INSERT INTO customer (C_Fname, C_Lname, C_Age, C_Sex, C_Phno, C_Mail) 
+                VALUES ('$fname', '$lname', $age, '$gender_code', '$phno', '$mail')";
+        
+        if ($conn->query($sql)) {
+            set_flash_message("Customer '$fname' registered successfully.", "success");
+            header("Location: view.php");
+            exit();
+        } else {
+            set_flash_message("Registration failed. Please check for duplicate details.", "error");
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Customer - PHARMACIA</title>
+</head>
+<body class="bg-slate-50">
+    <?php require('../sidebar.php'); ?>
 
-<link rel="stylesheet" type="text/css" href="../../../assets/css/table.css">
-<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
-<link rel="stylesheet" type="text/css" href="../../../assets/css/form.css">
+    <!-- Page Header -->
+    <div class="mb-10 flex items-center justify-between">
+        <div>
+            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">New Member</h2>
+            <p class="text-slate-500 mt-1 font-medium">Register a new customer for loyalty and history.</p>
+        </div>
+        <a href="view.php" class="bg-white text-slate-600 px-6 py-3 rounded-2xl font-bold text-sm border border-slate-200 hover:bg-slate-50 transition-all flex items-center shadow-sm">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to Directory
+        </a>
+    </div>
 
-<style>
-body {font-family:Arial;}
-</style>
+    <!-- Form Card -->
+    <div class="max-w-4xl bg-white p-10 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/40">
+        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                
+                <!-- Personal Info -->
+                <div class="space-y-6">
+                    <h3 class="text-xs font-black text-blue-600 uppercase tracking-[0.2em] mb-4">Personal Details</h3>
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">First name <span class="text-rose-500">*</span></label>
+                        <input type="text" name="cfname" placeholder="John" required
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-semibold text-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Last name</label>
+                        <input type="text" name="clname" placeholder="Doe"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-semibold text-slate-700">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Age</label>
+                            <input type="number" name="age" placeholder="00"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-semibold text-slate-700">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Gender <span class="text-rose-500">*</span></label>
+                            <select name="sex" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-semibold text-slate-700 appearance-none">
+                                <option value="selected">Select</option>
+                                <option>Female</option>
+                                <option>Male</option>
+                                <option>Others</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
-<body>
+                <!-- Contact Info -->
+                <div class="space-y-6">
+                    <h3 class="text-xs font-black text-emerald-600 uppercase tracking-[0.2em] mb-4">Contact Information</h3>
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Phone Number</label>
+                        <input type="tel" name="phno" placeholder="+1..."
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none font-semibold text-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Email Address</label>
+                        <input type="email" name="emid" placeholder="john@example.com"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none font-semibold text-slate-700">
+                    </div>
+                    <div class="pt-6">
+                        <button type="submit" name="add" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-black py-5 rounded-2xl shadow-xl transition-all active:scale-95 flex items-center justify-center">
+                            Save Customer Details
+                        </button>
+                        <p class="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-4">Membership ID will be assigned automatically</p>
+                    </div>
+                </div>
 
-	<?php require('../sidebar.php'); ?>
-	
-	<center>
-	<div class="head">
-	<h2> ADD CUSTOMER DETAILS</h2>
-	</div>
-	</center>
-	
-	<br><br><br><br><br><br><br><br>
-	
-	<div class="one">
-		<div class="row">
-			<form action="<?=$_SERVER['PHP_SELF']?>" method="post">
-				<div class="column">
-					<p>
-						<label for="cid">Customer ID:</label><br>
-						<input type="number" name="cid">
-					</p>
-					<p>
-						<label for="cfname">First Name:</label><br>
-						<input type="text" name="cfname">
-					</p>
-					<p>
-						<label for="clname">Last Name:</label><br>
-						<input type="text" name="clname">
-					</p>
-					<p>
-						<label for="age">Age:</label><br>
-						<input type="number" name="age">
-					</p>
-					
-					<p>
-						<label for="sex">Sex: </label><br>
-						<select id="sex" name="sex">
-								<option value="selected">Select</option>
-								<option>Female</option>
-								<option>Male</option>
-								<option>Others</option>
-						</select>
-					</p>
-					
-				</div>
-				<div class="column">
-					
-					<p>
-						<label for="phno">Phone Number: </label><br>
-						<input type="number" name="phno">
-					</p>
-					<p>
-						<label for="emid">Email ID:</label><br>
-						<input type="text" name="emid">
-					</p>
-				</div>
-				
-			<input type="submit" name="add" value="Add Customer">
-			</form>
-		<br>
-		
-		
-		<?php
-			
-			include "../../../config/config.php";
-			
-			if(isset($_POST['add']))
-			{
-			$id = mysqli_real_escape_string($conn, $_REQUEST['cid']);
-			$fname = mysqli_real_escape_string($conn, $_REQUEST['cfname']);
-			$lname = mysqli_real_escape_string($conn, $_REQUEST['clname']);
-			$age = mysqli_real_escape_string($conn, $_REQUEST['age']);
-			$sex = mysqli_real_escape_string($conn, $_REQUEST['sex']);
-			$phno = mysqli_real_escape_string($conn, $_REQUEST['phno']);
-			$mail = mysqli_real_escape_string($conn, $_REQUEST['emid']);
+            </div>
+        </form>
+    </div>
 
-			 
-			$sql = "INSERT INTO customer VALUES ($id, '$fname', '$lname',$age,'$sex',$phno, '$mail')";
-			if(mysqli_query($conn, $sql)){
-				echo "<p style='font-size:8;'>Customer successfully added!</p>";
-			} else{
-				echo "<p style='font-size:8; color:red;'>Error! Check details.</p>";
-			}
-			}
-			 
-			$conn->close();
-		?>
-		</div>
-	</div>	
-		
+    <!-- Layout Closes -->
+    </main>
+    </div>
+    </div>
+    
+    <?php $conn->close(); ?>
 </body>
-
-<script>
-	var dropdown = document.getElementsByClassName("dropdown-btn");
-	var i;
-
-		for (i = 0; i < dropdown.length; i++) {
-		  dropdown[i].addEventListener("click", function() {
-		  this.classList.toggle("active");
-		  var dropdownContent = this.nextElementSibling;
-		  if (dropdownContent.style.display === "block") {
-		  dropdownContent.style.display = "none";
-		  } else {
-		  dropdownContent.style.display = "block";
-		  }
-		  });
-		}
-</script>
-
 </html>

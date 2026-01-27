@@ -24,10 +24,10 @@ function render_flash_message() {
         unset($_SESSION['flash_message']);
 
         $colors = [
-            'success' => 'bg-emerald-500 border-emerald-600 text-white',
-            'error' => 'bg-rose-500 border-rose-600 text-white',
-            'warning' => 'bg-amber-500 border-amber-600 text-white',
-            'info' => 'bg-sky-500 border-sky-600 text-white'
+            'success' => 'bg-emerald-500 border-emerald-600 text-green',
+            'error' => 'bg-rose-500 border-rose-600 text-red',
+            'warning' => 'bg-amber-500 border-amber-600 text-yellow',
+            'info' => 'bg-sky-500 border-sky-600 text-blue'
         ];
 
         $icons = [
