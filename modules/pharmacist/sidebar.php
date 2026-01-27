@@ -2,6 +2,8 @@
 // Determine the relative path to the pharmacist root
 $current_dir = basename(dirname($_SERVER['PHP_SELF']));
 $path = ($current_dir == 'pharmacist') ? '' : '../';
+
+require_once __DIR__ . '/../../includes/alerts.php';
 ?>
 
 <!-- Tailwind CSS Base Setup -->
@@ -12,79 +14,112 @@ $path = ($current_dir == 'pharmacist') ? '' : '../';
         body { font-family: 'Inter', sans-serif; @apply bg-slate-50 text-slate-900; }
     }
     .sidenav.mobile-visible { @apply translate-x-0; }
-    .dropdown-container.show { @apply block; }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { @apply bg-slate-100; }
+    ::-webkit-scrollbar-thumb { @apply bg-slate-300 rounded-full; }
+    ::-webkit-scrollbar-thumb:hover { @apply bg-slate-400; }
 </style>
+
+<?php render_flash_message(); ?>
 
 <div class="flex min-h-screen">
     <!-- Sidebar -->
-    <div class="sidenav fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out border-r border-slate-800">
-        <div class="p-6 flex items-center space-x-3 border-b border-slate-800">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-                <span class="text-white font-bold text-xl">+</span>
+    <div class="sidenav fixed inset-y-0 left-0 z-50 w-64 bg-slate-950 text-slate-400 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out border-r border-slate-800 shadow-2xl">
+        <div class="p-8 flex items-center space-x-3 mb-4">
+            <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                <span class="text-white font-black text-xl">+</span>
             </div>
-            <h2 class="text-white font-extrabold text-xl tracking-tighter">PHARMACIA</h2>
+            <div>
+                <h2 class="text-white font-black text-xl tracking-tighter leading-none">PHARMACIA</h2>
+                <p class="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 mt-1">Pharmacist</p>
+            </div>
         </div>
         
-        <nav class="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-80px)]">
-            <a href="<?php echo $path; ?>dashboard.php" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-800 hover:text-white transition-colors group">
-                <span class="font-medium">Dashboard</span>
+        <nav class="px-4 space-y-1 overflow-y-auto max-h-[calc(100vh-120px)] custom-scrollbar">
+            <a href="<?php echo $path; ?>dashboard.php" class="flex items-center px-4 py-3 rounded-xl hover:bg-white/5 hover:text-white transition-all group">
+                <svg class="w-5 h-5 mr-3 text-slate-500 group-hover:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                <span class="font-semibold text-sm">Dashboard</span>
             </a>
             
-            <a href="<?php echo $path; ?>inventory/view.php" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-800 hover:text-white transition-colors group">
-                <span class="font-medium text-left flex-grow">Inventory</span>
+            <a href="<?php echo $path; ?>inventory/view.php" class="flex items-center px-4 py-3 rounded-xl hover:bg-white/5 hover:text-white transition-all group">
+                <svg class="w-5 h-5 mr-3 text-slate-500 group-hover:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                <span class="font-semibold text-sm">Inventory Tracking</span>
             </a>
 
-            <a href="<?php echo $path; ?>sales/pos1.php" class="flex items-center px-4 py-3 rounded-lg hover:bg-slate-800 hover:text-white transition-colors group bg-blue-600/10 text-blue-400">
-                <span class="font-medium">New Sale</span>
-            </a>
-
-            <!-- Customers -->
-            <div>
-                <button class="dropdown-btn w-full flex items-center px-4 py-3 rounded-lg hover:bg-slate-800 hover:text-white transition-colors group">
-                    <span class="font-medium text-left flex-grow">Customers</span>
-                    <svg class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            <div class="pt-4 mt-4 border-t border-slate-800">
+                <p class="px-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">Customer Relations</p>
+                <button class="dropdown-btn w-full flex items-center px-4 py-3 rounded-xl hover:bg-white/5 hover:text-white transition-all group">
+                    <svg class="w-5 h-5 mr-3 text-slate-500 group-hover:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span class="font-semibold text-sm text-left flex-grow">Customers</span>
+                    <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
-                <div class="dropdown-container hidden bg-slate-950/50 rounded-lg mt-1 space-y-1 py-1">
-                    <a href="<?php echo $path; ?>customers/add.php" class="block px-8 py-2 text-sm hover:text-white">Add New Customer</a>
-                    <a href="<?php echo $path; ?>customers/view.php" class="block px-8 py-2 text-sm hover:text-white">View Customers</a>
+                <div class="dropdown-container hidden bg-black/20 rounded-xl mt-1 py-1 mx-2">
+                    <a href="<?php echo $path; ?>customers/add.php" class="block px-8 py-2 text-xs font-medium hover:text-white hover:translate-x-1 transition-all">New Profile</a>
+                    <a href="<?php echo $path; ?>customers/view.php" class="block px-8 py-2 text-xs font-medium hover:text-white hover:translate-x-1 transition-all">Member List</a>
                 </div>
             </div>
+
+            <div class="pt-4 mt-6">
+                <a href="<?php echo $path; ?>sales/pos1.php" class="flex items-center px-4 py-4 rounded-2xl bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 hover:bg-emerald-500 transition-all font-bold">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    Process New Sale
+                </a>
+            </div>
         </nav>
+
+        <div class="absolute bottom-0 left-0 w-full p-6 border-t border-slate-800 bg-slate-950">
+            <?php
+            include $path . "../../config/config.php";
+            if (session_status() == PHP_SESSION_NONE) { session_start(); }
+            $sql="SELECT E_FNAME from EMPLOYEE WHERE E_ID='$_SESSION[user]'";
+            $result=$conn->query($sql);
+            $row=$result->fetch_row();
+            $ename=$row[0];
+            ?>
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs font-bold text-emerald-400"><?php echo strtoupper(substr($ename, 0, 2)); ?></div>
+                <div class="flex-grow overflow-hidden">
+                    <p class="text-xs font-bold text-white truncate"><?php echo $ename; ?></p>
+                    <p class="text-[10px] text-slate-500 italic">On Duty</p>
+                </div>
+                <a href="<?php echo $path; ?>../auth/logout.php" class="text-slate-500 hover:text-rose-500 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                </a>
+            </div>
+        </div>
     </div>
 
     <!-- Main Content Wrapper -->
     <div class="flex-grow lg:ml-64 transition-all duration-300">
         <!-- Top Nav -->
-        <?php
-        include $path . "../../config/config.php";
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
-        $sql="SELECT E_FNAME from EMPLOYEE WHERE E_ID='$_SESSION[user]'";
-        $result=$conn->query($sql);
-        $row=$result->fetch_row();
-        $ename=$row[0];
-        ?>
-        <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-40">
+        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-40">
             <div class="flex items-center">
-                <button id="menu-toggle" class="p-2 -ml-2 rounded-lg hover:bg-slate-100 lg:hidden">
-                    <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <button id="menu-toggle" class="p-2 -ml-2 rounded-xl hover:bg-slate-100 lg:hidden text-slate-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
-                <h1 class="text-lg font-semibold text-slate-800 ml-4 lg:ml-0 hidden sm:block">Pharmacist Portal</h1>
+                <div class="ml-4 lg:ml-0">
+                    <h1 class="text-sm font-bold text-slate-400 uppercase tracking-widest hidden sm:block">Healthcare / <span class="text-slate-900">Dispensing Terminal</span></h1>
+                </div>
             </div>
             
-            <div class="flex items-center space-x-6">
-                <div class="text-right hidden sm:block">
-                    <p class="text-sm font-bold text-slate-900"><?php echo $ename; ?></p>
-                    <p class="text-xs text-slate-500">Pharmacist</p>
+            <div class="flex items-center space-x-4">
+                <div class="relative hidden md:block">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </span>
+                    <input type="text" placeholder="Quick Find..." class="bg-slate-100 border-none rounded-2xl py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-emerald-500 w-64 transition-all">
                 </div>
-                <a href="<?php echo $path; ?>../auth/logout.php" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                    Log Out
-                </a>
+                <div class="h-10 w-[1px] bg-slate-200 mx-2 hidden sm:block"></div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">System Online</span>
+                </div>
             </div>
         </header>
 
-        <main class="p-8 pb-12">
+        <main class="p-4 md:p-8 lg:p-12 max-w-7xl mx-auto">
 
 <script>
     document.getElementById('menu-toggle').addEventListener('click', function() {
@@ -95,7 +130,7 @@ $path = ($current_dir == 'pharmacist') ? '' : '../';
         if (window.innerWidth < 1024) {
             const sidebar = document.querySelector('.sidenav');
             const toggle = document.getElementById('menu-toggle');
-            if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+            if (sidebar && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
                 sidebar.classList.remove('mobile-visible');
             }
         }
@@ -105,14 +140,18 @@ $path = ($current_dir == 'pharmacist') ? '' : '../';
     for (var i = 0; i < dropdowns.length; i++) {
         dropdowns[i].addEventListener("click", function() {
             var content = this.nextElementSibling;
+            var icon = this.querySelector('svg:last-child');
             if (content.style.display === "block") {
                 content.style.display = "none";
-                this.querySelector('svg').style.transform = 'rotate(0deg)';
+                icon.style.transform = 'rotate(0deg)';
+                this.classList.remove('text-white', 'bg-white/5');
             } else {
                 content.style.display = "block";
-                this.querySelector('svg').style.transform = 'rotate(180deg)';
+                icon.style.transform = 'rotate(180deg)';
+                this.classList.add('text-white', 'bg-white/5');
             }
         });
     }
 </script>
+
 	
