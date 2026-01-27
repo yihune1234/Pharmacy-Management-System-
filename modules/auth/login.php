@@ -1,92 +1,91 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-<link rel="stylesheet" type="text/css" href="../../assets/css/login.css">
-<div class="header">
-<h1>Login </h1>
-<p style="margin-top:-20px;line-height:1;font-size:30px;">Pharmacy Management System</p>
-</div>
-<title>
-pharmacy
-</title>
+    <link rel="stylesheet" type="text/css" href="../../assets/css/login.css">
+    <div class="header">
+        <h1>Login</h1>
+        <p style="margin-top:-20px;line-height:1;font-size:30px;">Pharmacy Management System</p>
+    </div>
+    <title>Pharmacy</title>
 </head>
 
 <body>
+    <br><br><br><br>
+    <div class="container">
+        <form method="post" action="">
+            <div id="div_login">
+                <h1>Login</h1>
+                <center>
+                    <div>
+                        <input type="text" class="textbox" name="uname" placeholder="Username" required />
+                    </div>
+                    <div>
+                        <input type="password" class="textbox" name="pwd" placeholder="Password" required />
+                    </div>
+                    <div>
+                        <input type="submit" value="Login" name="submit" id="submit" />
+                    </div>
+                </center>
+            </div>
+        </form>
+    </div>
 
-	<br><br><br><br>
-	<div class="container">
-		<form method="post" action="">
-			<div id="div_login">
-				<h1> Login</h1>
-				<center>
-				<div>
-					<input type="text" class="textbox" id="uname" name="uname" placeholder="Username" />
-				</div>
-				<div>
-					<input type="password" class="textbox" id="pwd" name="pwd" placeholder="Password"/>
-				</div>
-				<div>
-					<input type="submit" value="Login" name="submit" id="submit" />
-				</div>
-			 
-				
-	<?php
+<?php
 include "../../config/config.php";
+session_start();
 
 if(isset($_POST['submit'])){
 
-    $uname = mysqli_real_escape_string($conn,$_POST['uname']);
-    $password = mysqli_real_escape_string($conn,$_POST['pwd']);
+    $uname = mysqli_real_escape_string($conn, $_POST['uname']);
+    $password = mysqli_real_escape_string($conn, $_POST['pwd']);
 
-    if ($uname != "" && $password != ""){
+    if($uname != "" && $password != ""){
 
-        // Fetch user details along with role
-        $sql="SELECT e_id, role FROM emplogin WHERE e_username='$uname' AND e_pass='$password'";
+        // Fetch user info along with role name
+        $sql = "
+            SELECT e.E_ID, e.username, e.password, r.role_name
+            FROM employee e
+            LEFT JOIN roles r ON e.role_id = r.role_id
+            WHERE e.username = '$uname' AND e.password = '$password'
+        ";
         $result = $conn->query($sql);
-        $row = $result->fetch_assoc(); // fetch_assoc to get role by key
 
-        if(!$row) {
-            echo "<p style='color:red;'>Invalid username or password!</p>";
-        }
-        else {
-            $emp = $row['e_id'];
-            $role = $row['role']; // assuming your table has a 'role' column
+        if($result && $result->num_rows == 1){
+            $row = $result->fetch_assoc();
 
-            session_start();
-            $_SESSION['user'] = $emp;
-            $_SESSION['role'] = $role;
+            $_SESSION['user'] = $row['E_ID'];
+            $_SESSION['username'] = $row['username'];
+            $_SESSION['role'] = $row['role_name'];
 
             // Redirect based on role
-            if($role == "pharmacist"){
-                header("location:../pharmacist/dashboard.php");
-                exit();
-            } elseif($role == "admin") {
-                header("location:../admin/dashboard.php");
-                exit();
-            } else {
-                echo "<p style='color:red;'>Unknown role!</p>";
+            switch(strtolower($row['role_name'])){
+                case "admin":
+                    header("Location: ../admin/dashboard.php");
+                    exit();
+                case "pharmacist":
+                    header("Location: ../pharmacist/dashboard.php");
+                    exit();
+                case "cashier":
+                    header("Location: ../cashier/dashboard.php");
+                    exit();
+                default:
+                    echo "<p style='color:red;'>Unknown role!</p>";
             }
-        }
-    }
-}
 
-if(isset($_POST['psubmit']))
-{
-    header("location:mainpage.php");
+        } else {
+            echo "<p style='color:red;'>Invalid username or password!</p>";
+        }
+
+    } else {
+        echo "<p style='color:red;'>Please enter both username and password!</p>";
+    }
 }
 ?>
 
-				</center> 
-			</div>
-		</form>
-	</div>
-	<div class=footer>
-	<br>
-	Powered by VE Technologies. 
-	<br><br>
-	</div>
-
+    <div class="footer">
+        <br>
+        Powered by VE Technologies. 
+        <br><br>
+    </div>
 </body>
-
 </html>
