@@ -1,46 +1,99 @@
 #table1 {
-  font-family: Arial;
-  border-collapse: collapse;
-  margin-top:50px;
-  margin-right:25px;
-  width: 70%;
-  overflow:auto;
+  width: calc(100% - var(--sidebar-width) - 80px);
+  margin: 30px 40px 50px auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: var(--white);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid #e2e8f0;
 }
-
-#table1 td, #table1 th {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
-#table1 tr:nth-child(even){background-color: #f2f2f2;}
-
-#table1 tr:hover {background-color: #ddd;}
 
 #table1 th {
-  padding-top: 12px;
-  padding-bottom: 12px;
+  background-color: #f8fafc;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 16px 24px;
+  border-bottom: 2px solid #e2e8f0;
   text-align: left;
-  background-color: #0077b3;
-  color: white;
 }
 
+#table1 td {
+  padding: 16px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+#table1 tr:last-child td {
+  border-bottom: none;
+}
+
+#table1 tr:hover {
+  background-color: #fdfdfd;
+  transition: var(--transition);
+}
+
+#table1 tr:nth-child(even) {
+  background-color: #fafbfc;
+}
+
+/* Button Stylings in Tables */
 .button1 {
-  border:none;
-  color: white;
-  padding: 10px 24px;
-  text-align: center;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
   text-decoration: none;
-  display: inline-block;
-  margin: 4px 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  border: none;
   cursor: pointer;
 }
 
-.edit-btn
-{
-	background-color:#2E8B57;
+.edit-btn {
+  background-color: #ecfdf5;
+  color: #059669;
 }
 
-.del-btn
-{
-	background-color:#800000;
+.edit-btn:hover {
+  background-color: #10b981;
+  color: white;
+}
+
+.del-btn {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.del-btn:hover {
+  background-color: #ef4444;
+  color: white;
+}
+
+.view-btn {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.view-btn:hover {
+  background-color: #3b82f6;
+  color: white;
+}
+
+@media screen and (max-width: 768px) {
+  #table1 {
+    width: calc(100% - 40px);
+    margin: 20px;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }

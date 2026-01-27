@@ -4,8 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="nav2.css">
-<link rel="stylesheet" type="text/css" href="form4.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/form.css">
 <title>
 Medicines
 </title>
@@ -13,7 +13,7 @@ Medicines
 
 <body>
 <?php 
-require('./admin_sidebar.php');
+require('../sidebar.php');
 ?>
 	<center>
 	<div class="head">
@@ -71,7 +71,7 @@ require('./admin_sidebar.php');
 	</div>	
 	<?php
 	
-		include "config.php";
+		include "../../../config/config.php";
 		 
 		if(isset($_POST['add']))
 		{

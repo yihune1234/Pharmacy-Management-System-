@@ -3,8 +3,8 @@
 
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="nav2.css">
-<link rel="stylesheet" type="text/css" href="form3.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/form.css">
 <link rel="stylesheet" type="text/css" href="table2.css">
 <title>
 New Sales
@@ -13,35 +13,7 @@ New Sales
 
 <body>
 
-		<div class="sidenav">
-			<h2 style="font-family:Arial; color:white; text-align:center;"> PHARMACIA </h2>
-			<a href="pharmmainpage.php">Dashboard</a>
-			
-			<a href="pharm-inventory.php">View Inventory</a>
-			<a href="pharm-pos1.php">Add New Sale</a>
-			<button class="dropdown-btn">Customers
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="pharm-customer.php">Add New Customer</a>
-				<a href="pharm-customer-view.php">View Customers</a>
-			</div>
-	</div>
-
-	<?php
-include "./config/config.php";
-		session_start();
-	
-		$sql="SELECT E_FNAME from EMPLOYEE WHERE E_ID='$_SESSION[user]'";
-		$result=$conn->query($sql);
-		$row=$result->fetch_row();
-		
-		$ename=$row[0];
-	?>
-
-	<div class="topnav">
-		<a href="logout1.php">Logout(signed in as <?php echo $ename; ?>)</a>
-	</div>
+		<?php require('../sidebar.php'); ?>
 	
 	<center>
 	<div class="head">
@@ -188,7 +160,7 @@ include "./config/config.php";
 				echo mysqli_error($conn);
 				
 				echo "<br><br> <center>";
-				echo "<a class='button1 view-btn' href=pharm-pos2.php?sid=".$sid.">View Order</a>";
+				echo "<a class='button1 view-btn' href='pos2.php?sid=".$sid."'>View Order</a>";
 				echo "</center>";
 				}
 		}	

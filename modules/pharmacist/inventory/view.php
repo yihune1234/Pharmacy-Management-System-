@@ -1,12 +1,19 @@
 <?php
 
-	include "config.php";
-	
+	// load central config (creates $conn)
+	require_once __DIR__ . '/../../../config/config.php';
+
+	// if no working DB connection, send user to installer
+	if (!isset($conn) || !($conn instanceof mysqli) || ($conn instanceof mysqli && $conn->connect_error)) {
+		header('Location: /Pharmacy-Management-System/database/install.php');
+		exit();
+	}
+
 	if(isset($_POST['search'])) {
 		
-		$search=$_POST['valuetosearch'];
-		$search_result=mysqli_query($conn,"SET @p0='$search';")or die(mysqli_error($conn));
-		$search_result=mysqli_query($conn,"CALL `SEARCH_INVENTORY`(@p0);") or die(mysqli_error($conn));
+		$search=$_POST['valuetosearch'] ?? '';
+		$query="SELECT med_id as medid, med_name as medname, med_qty as medqty, category as medcategory, med_price as medprice, location_rack as medlocation FROM meds WHERE med_name LIKE '%$search%' OR med_id LIKE '%$search%'";
+		$search_result=filtertable($query);
 	}
 	else {
 			$query="SELECT med_id as medid, med_name as medname,med_qty as medqty,category as medcategory,med_price as medprice,location_rack as medlocation FROM meds";
@@ -14,8 +21,9 @@
 	}
 	
 	function filtertable($query)
-	{	$conn = mysqli_connect("localhost", "root", "", "pharmacy");
-		$filter_result=mysqli_query($conn,$query);
+	{
+		global $conn;
+		$filter_result = $conn->query($query);
 		return $filter_result;
 	}
 	
@@ -25,9 +33,10 @@
 <html>
 
 <head>
-<link rel="stylesheet" type="text/css" href="table1.css">
-<link rel="stylesheet" type="text/css" href="nav2.css">
-<link rel="stylesheet" type="text/css" href="form2.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/table.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/form.css">
 <title>
 Inventory
 </title>
@@ -35,36 +44,9 @@ Inventory
 
 <body>
 
-	<div class="sidenav">
-			<h2 style="font-family:Arial; color:white; text-align:center;"> PHARMACIA </h2>
-			<a href="pharmmainpage.php">Dashboard</a>
-			<a href="pharm-inventory.php">View Inventory</a>
-			<a href="pharm-pos1.php">Add New Sale</a>
-			<button class="dropdown-btn">Customers
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="pharm-customer.php">Add New Customer</a>
-				<a href="pharm-customer-view.php">View Customers</a>
-			</div>
-	</div>
-
 	<?php
-	
-include "./config/config.php";
-	session_start();
-
-	$sql1="SELECT E_FNAME from EMPLOYEE WHERE E_ID='$_SESSION[user]'";
-	$result1=$conn->query($sql1);
-	$row1=$result1->fetch_row();
-	
-	$ename=$row1[0];
-		
+	require('../sidebar.php');
 	?>
-
-	<div class="topnav">
-		<a href="logout1.php">Logout(signed in as <?php echo $ename; ?>)</a>
-	</div>
 
 	
 	<center>

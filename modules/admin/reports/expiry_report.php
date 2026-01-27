@@ -3,8 +3,8 @@
 
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="nav2.css">
-<link rel="stylesheet" type="text/css" href="table1.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/table.css">
 <title>
 Reports
 </title>
@@ -12,7 +12,7 @@ Reports
 
 <body>
 <?php 
-require('./admin_sidebar.php');
+require('../sidebar.php');
 ?>
 	<center>
 	<div class="head">
@@ -34,8 +34,8 @@ require('./admin_sidebar.php');
 		
 	<?php
 	
-		include "config.php";
-		$result=mysqli_query($conn,"CALL `EXPIRY`();");
+		include "../../../config/config.php";
+		$result=mysqli_query($conn,"SELECT p_id, sup_id, med_id, p_qty, p_cost, pur_date, mfg_date, exp_date FROM purchase WHERE exp_date <= DATE_ADD(CURDATE(), INTERVAL 6 MONTH) AND exp_date >= CURDATE();");
 		if ($result->num_rows > 0) { 
 
 		while($row = $result->fetch_assoc()) {

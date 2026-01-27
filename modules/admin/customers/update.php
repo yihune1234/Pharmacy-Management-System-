@@ -2,8 +2,8 @@
 <html>
 
 <head>
-<link rel="stylesheet" type="text/css" href="nav2.css">
-<link rel="stylesheet" type="text/css" href="form4.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/form.css">
 <title>
 Customers
 </title>
@@ -11,7 +11,7 @@ Customers
 
 <body>
 <?php 
-require('./admin_sidebar.php');
+require('../sidebar.php');
 ?>
 	
 	<center>
@@ -26,7 +26,7 @@ require('./admin_sidebar.php');
 		
 	<?php
 		
-		include "config.php";
+		include "../../../config/config.php";
 		
 		if(isset($_GET['id']))
 		{
@@ -48,7 +48,7 @@ require('./admin_sidebar.php');
 			 
 		$sql="UPDATE customer SET c_fname='$fname',c_lname='$lname',c_age='$age',c_sex='$sex',c_phno='$phno',c_mail='$mail' where c_id='$id'";
 		if ($conn->query($sql))
-		header("location:customer-view.php");
+		header("location:view.php");
 		else
 		echo "<p style='font-size:8; color:red;'>Error! Unable to update.</p>";
 		}

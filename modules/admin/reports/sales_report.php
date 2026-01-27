@@ -3,9 +3,9 @@
 
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="nav2.css">
-<link rel="stylesheet" type="text/css" href="table1.css">
-<link rel="stylesheet" type="text/css" href="form3.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/table.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/form.css">
 <title>
 Reports
 </title>
@@ -16,60 +16,7 @@ body {font-family:Arial;}
 
 <body>
 
-	<div class="sidenav">
-			<h2 style="font-family:Arial; color:white; text-align:center;"> PHARMACIA </h2>
-			<a href="adminmainpage.php">Dashboard</a>
-			<button class="dropdown-btn">Inventory
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="inventory-add.php">Add New Medicine</a>
-				<a href="inventory-view.php">Manage Inventory</a>
-			</div>
-			<button class="dropdown-btn">Suppliers
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="supplier-add.php">Add New Supplier</a>
-				<a href="supplier-view.php">Manage Suppliers</a>
-			</div>
-			<button class="dropdown-btn">Stock Purchase
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="purchase-add.php">Add New Purchase</a>
-				<a href="purchase-view.php">Manage Purchases</a>
-			</div>
-			<button class="dropdown-btn">Employees
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="employee-add.php">Add New Employee</a>
-				<a href="employee-view.php">Manage Employees</a>
-			</div>
-			<button class="dropdown-btn">Customers
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="customer-add.php">Add New Customer</a>
-				<a href="customer-view.php">Manage Customers</a>
-			</div>
-			<a href="sales-view.php">View Sales Invoice Details</a>
-			<a href="salesitems-view.php">View Sold Products Details</a>
-			<a href="pos1.php">Add New Sale</a>
-			<button class="dropdown-btn">Reports
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="stockreport.php">Medicines - Low Stock</a>
-				<a href="expiryreport.php">Medicines - Soon to Expire</a>
-				<a href="salesreport.php">Transactions Reports</a>
-			</div>
-	</div>
-
-	<div class="topnav">
-		<a href="logout.php">Logout</a>
-	</div>
+	<?php require('../sidebar.php'); ?>
 	
 	<center>
 	<div class="head">
@@ -92,22 +39,22 @@ body {font-family:Arial;}
 			</form>	
 	
 	<?php
-	include "config.php";
+	include "../../../config/config.php";
 		if(isset($_POST['submit'])) {
 			
 			$start=$_POST['start'];
 			$end=$_POST['end'];
-			$res=mysqli_query($conn,"SELECT P_AMT('$start','$end') AS PAMT") or die(mysqli_error($conn));
+			$res=mysqli_query($conn,"SELECT SUM(p_cost) AS PAMT FROM purchase WHERE pur_date >= '$start' AND pur_date <= '$end'") or die(mysqli_error($conn));
 			while($row=mysqli_fetch_array($res))
 			{
-				$pamt=$row['PAMT'];
+				$pamt=$row['PAMT'] ?? 0;
 				
 			}
 			
-			$res=mysqli_query($conn,"SELECT S_AMT('$start','$end') AS SAMT;") or die(mysqli_error($conn));
+			$res=mysqli_query($conn,"SELECT SUM(total_amt) AS SAMT FROM sales WHERE s_date >= '$start' AND s_date <= '$end';") or die(mysqli_error($conn));
 			while($row=mysqli_fetch_array($res))
 			{
-				$samt=$row['SAMT'];
+				$samt=$row['SAMT'] ?? 0;
 				
 			} 
 			
@@ -163,7 +110,7 @@ body {font-family:Arial;}
 		</tr>
 	
 	<?php
-	include "config.php";
+	include "../../../config/config.php";
 	$sql = "SELECT sale_id, c_id,s_date,s_time,total_amt,e_id FROM sales
 			WHERE s_date >= '$start' AND s_date <= '$end';";
 	$result = $conn->query($sql);

@@ -1,5 +1,5 @@
 <?php
-	include "config.php";
+	include "../../../config/config.php";
 	
 	if(isset($_GET['id']))
 	{
@@ -16,8 +16,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="nav2.css">
-<link rel="stylesheet" type="text/css" href="form4.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/form.css">
 <title>
 Medicines
 </title>
@@ -26,7 +26,7 @@ Medicines
 <body>
 
 	<?php 
-require('./admin_sidebar.php');
+require('../sidebar.php');
 ?>
 	<center>
 	<div class="head">
@@ -82,7 +82,7 @@ require('./admin_sidebar.php');
 			 
 		$sql="UPDATE meds SET med_name='$name',med_qty='$qty',category='$cat',med_price='$price',location_rack='$lcn' where med_id='$id'";
 		if ($conn->query($sql))
-		header("location:inventory-view.php");
+		header("location:view.php");
 		else
 		echo "<p style='font-size:8;color:red;'>Error! Unable to update.</p>";
 		}

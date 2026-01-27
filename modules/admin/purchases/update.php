@@ -1,5 +1,5 @@
 <?php
-		include "config.php";
+		include "../../../config/config.php";
 	
 		if(isset($_GET['pid'])&&isset($_GET['sid'])&&isset($_GET['mid']))
 		{
@@ -25,7 +25,7 @@
 		$sql="UPDATE purchase SET p_cost='$cost',p_qty='$qty',pur_date='$pdate',mfg_date='$mdate',exp_date='$edate' 
 				where p_id='$pid' and sup_id='$sid' and med_id='$mid'";
 		if ($conn->query($sql))
-		header("location:purchase-view.php");
+		header("location:view.php");
 
 		 }
 ?>
@@ -36,8 +36,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="nav2.css">
-<link rel="stylesheet" type="text/css" href="form4.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/form.css">
 <title>
 Purchases
 </title>
@@ -45,79 +45,7 @@ Purchases
 
 <body>
 
-		<div class="sidenav">
-		
-	<?php 
-			if( isset($_POST['update']))
-		 {
-			$pid=$_POST['pid'];
-			$sid=$_POST['sid'];
-			$mid=$_POST['mid'];
-			$qty = $_POST['pqty'];
-			$cost = $_POST['pcost'];
-			$pdate = $_POST['pdate'];
-			$mdate = $_POST['mdate'];
-			$edate = $_POST['edate'];
-			
-			$sql="UPDATE purchase SET p_cost='$cost',p_qty='$qty',pur_date='$pdate',mfg_date='$mdate',exp_date='$edate' 
-				where p_id='$pid' and sup_id='$sid' and med_id='$mid'";
-			if (!($conn->query($sql)))
-				echo "<p style='font-size:8; color:red;'>Error! Unable to update.</p>";
-		 }
-	?>
-			<h2 style="font-family:Arial; color:white; text-align:center;"> PHARMACIA </h2>
-			<a href="adminmainpage.php">Dashboard</a>
-			<button class="dropdown-btn">Inventory
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="inventory-add.php">Add New Medicine</a>
-				<a href="inventory-view.php">Manage Inventory</a>
-			</div>
-			<button class="dropdown-btn">Suppliers
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="supplier-add.php">Add New Supplier</a>
-				<a href="supplier-view.php">Manage Suppliers</a>
-			</div>
-			<button class="dropdown-btn">Stock Purchase
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="purchase-add.php">Add New Purchase</a>
-				<a href="purchase-view.php">Manage Purchases</a>
-			</div>
-			<button class="dropdown-btn">Employees
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="employee-add.php">Add New Employee</a>
-				<a href="employee-view.php">Manage Employees</a>
-			</div>
-			<button class="dropdown-btn">Customers
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="purchase-add.php">Add New Customer</a>
-				<a href="purchase-view.php">Manage Customers</a>
-			</div>
-			<a href="sales-view.php">View Sales Invoice Details</a>
-			<a href="salesitems-view.php">View Sold Products Details</a>
-			<a href="pos1.php">Add New Sale</a>
-			<button class="dropdown-btn">Reports
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="stockreport.php">Medicines - Low Stock</a>
-				<a href="expiryreport.php">Medicines - Soon to Expire</a>
-				<a href="salesreport.php">Transactions Reports</a>
-			</div>
-	</div>
-
-	<div class="topnav">
-		<a href="logout.php">Logout</a>
-	</div>
+	<?php require('../sidebar.php'); ?>
 	
 	<center>
 	<div class="head">

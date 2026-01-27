@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 
-<link rel="stylesheet" type="text/css" href="table1.css">
-<link rel="stylesheet" type="text/css" href="nav2.css">
-<link rel="stylesheet" type="text/css" href="form4.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/table.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/form.css">
 
 <style>
 body {font-family:Arial;}
@@ -11,36 +11,7 @@ body {font-family:Arial;}
 
 <body>
 
-	<div class="sidenav">
-			<h2 style="font-family:Arial; color:white; text-align:center;"> PHARMACIA </h2>
-			<a href="pharmmainpage.php">Dashboard</a>
-			
-			<a href="pharm-inventory.php">View Inventory</a>
-			<a href="pharm-pos1.php">Add New Sale</a>
-			<button class="dropdown-btn">Customers
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="pharm-customer.php">Add New Customer</a>
-				<a href="pharm-customer-view.php">View Customers</a>
-			</div>
-	</div>
-
-	<?php
-	include "./config/config.php";
-	session_start();
-	
-	$sql="SELECT E_FNAME from EMPLOYEE WHERE E_ID='$_SESSION[user]'";
-	$result=$conn->query($sql);
-	$row=$result->fetch_row();
-	
-	$ename=$row[0];
-	
-	?>
-
-	<div class="topnav">
-		<a href="logout1.php">Logout(signed in as <?php echo $ename; ?>)</a>
-	</div>
+	<?php require('../sidebar.php'); ?>
 	
 	<center>
 	<div class="head">
@@ -101,7 +72,7 @@ body {font-family:Arial;}
 		
 		<?php
 			
-			include "config.php";
+			include "../../../config/config.php";
 			
 			if(isset($_POST['add']))
 			{

@@ -2,8 +2,9 @@
 <html>
 
 <head>
-<link rel="stylesheet" type="text/css" href="nav2.css">
-<link rel="stylesheet" type="text/css" href="table1.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/table.css">
 <title>
 Customers
 </title>
@@ -11,7 +12,7 @@ Customers
 
 <body>
 <?php 
-require('./admin_sidebar.php');
+require('../sidebar.php');
 ?>
 	<center>
 	<div class="head">
@@ -33,7 +34,7 @@ require('./admin_sidebar.php');
 		</tr>
 	<?php
 	
-	include "config.php";
+	include "../../../config/config.php";
 	$sql = "SELECT c_id,c_fname,c_lname,c_age,c_sex,c_phno,c_mail FROM customer";
 	$result = $conn->query($sql);
 	if ($result->num_rows > 0) {
@@ -49,8 +50,8 @@ require('./admin_sidebar.php');
 			echo "<td>" . $row["c_phno"]. "</td>";
 			echo "<td>" . $row["c_mail"]. "</td>";
 			echo "<td align=center>";
-				echo "<a class='button1 edit-btn' href=customer-update.php?id=".$row['c_id'].">Edit</a>";
-				echo "<a class='button1 del-btn' href=customer-delete.php?id=".$row['c_id'].">Delete</a>";
+				echo "<a class='button1 edit-btn' href='update.php?id=".$row['c_id']."'>Edit</a>";
+				echo "<a class='button1 del-btn' href='delete.php?id=".$row['c_id']."'>Delete</a>";
 			echo "</td>";
 		echo "</tr>";
 		}

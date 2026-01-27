@@ -1,5 +1,5 @@
 <?php
-	include "config.php";
+	include "../../../config/config.php";
 	$pid=$_GET['pid'];
 	$sid=$_GET['sid'];
 	$mid=$_GET['mid'];

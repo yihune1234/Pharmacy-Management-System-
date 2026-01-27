@@ -3,8 +3,8 @@
 
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="nav2.css">
-<link rel="stylesheet" type="text/css" href="form3.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/form.css">
 <link rel="stylesheet" type="text/css" href="table2.css">
 <title>
 New Sales
@@ -13,37 +13,7 @@ New Sales
 
 <body>
 
-		<div class="sidenav">
-			<h2 style="font-family:Arial; color:white; text-align:center;"> PHARMACIA </h2>
-			<a href="pharmmainpage.php">Dashboard</a>
-			
-			<a href="pharm-inventory.php">View Inventory</a>
-			<a href="pharm-pos1.php">Add New Sale</a>
-			<button class="dropdown-btn">Customers
-			<i class="down"></i>
-			</button>
-			<div class="dropdown-container">
-				<a href="pharm-customer.php">Add New Customer</a>
-				<a href="pharm-customer-view.php">View Customers</a>
-			</div>
-	</div>
-
-	<?php
-	
-	include "./config/config.php";
-		session_start();
-
-		$sql="SELECT E_FNAME from EMPLOYEE WHERE E_ID='$_SESSION[user]'";
-		$result=$conn->query($sql);
-		$row=$result->fetch_row();
-		
-		$ename=$row[0];
-	
-	?>
-
-	<div class="topnav">
-		<a href="logout1.php">Logout(signed in as <?php echo $ename; ?>)</a>
-	</div>
+		<?php require('../sidebar.php'); ?>
 	
 	<center>
 	<div class="head">
@@ -99,7 +69,7 @@ New Sales
 					echo "<td>" . $row2[1] . "</td>";
 					echo "<td>" . $row1["tot_price"]. "</td>";
 					echo "<td align=center>";
-					echo "<a name='delete' class='button1 del-btn' href=pharm-pos-delete.php?mid=".$row1['med_id']."&slid=".$sid.">Delete</a>";	
+					echo "<a name='delete' class='button1 del-btn' href='delete.php?mid=".$row1['med_id']."&slid=".$sid."'>Delete</a>";	
 					echo "</td>";
 				echo "</tr>";
 				}
@@ -111,7 +81,7 @@ New Sales
 		
 		<div class="one" style="background-color:white;">
 		<form method=post>
-		<a name='pos1' class='button1 view-btn' href=pharm-pos1.php?sid=".$sid.">Go Back to Sales Page</a> 
+		<a name='pos1' class='button1 view-btn' href='pos1.php?sid=<?php echo $sid; ?>'>Go Back to Sales Page</a> 
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		<input type='submit' name='custadd' value='Complete Order'><br>
 		</form>
@@ -121,14 +91,11 @@ New Sales
 		
 		if(isset($_POST['custadd'])) {
 			
-			$res=mysqli_query($conn,"SET @p0=$sid;");
-			$res=mysqli_query($conn,"CALL `TOTAL_AMT`(@p0,@p1);") or die(mysqli_error($conn));
-			$res=mysqli_query($conn,"SELECT @p1 as TOTAL;");
+			$res=mysqli_query($conn,"SELECT SUM(tot_price) AS TOTAL FROM sales_items WHERE sale_id=$sid;");
+			$row=mysqli_fetch_array($res);
+			$tot=$row['TOTAL'] ?? 0;
 			
-			while($row=mysqli_fetch_array($res))
-			{
-				$tot=$row['TOTAL'];
-			}
+			mysqli_query($conn,"UPDATE sales SET total_amt='$tot' WHERE sale_id=$sid;");
 					
 			echo "<table align='right' id='table1'>
 				<tr style='background-color: #f2f2f2;'>

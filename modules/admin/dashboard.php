@@ -2,6 +2,7 @@
 <html>
 
 <head>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <link rel="stylesheet" type="text/css" href="../../assets/css/nav.css">
 <title>
 Admin Dashboard
@@ -18,25 +19,34 @@ require('./sidebar.php');
 	</div>
 	</center>
 	
-	<a href="sales/pos1.php" title="Add New Sale">
-	<img src="../../assets/images/admin/carticon1.png" style="padding:8px;margin-left:450px;margin-top:40px;width:200px;height:200px;border:2px solid black;" alt="Add New Sale">
-	</a>
-	
-	<a href="inventory/view.php" title="View Inventory">
-	<img src="../../assets/images/common/inventory.png" style="padding:8px;margin-left:100px;margin-top:40px;width:200px;height:200px;border:2px solid black;" alt="Inventory">
-	</a>
-	
-	<a href="employees/view.php" title="View Employees">
-	<img src="../../assets/images/admin/emp.png" style="padding:8px;margin-left:100px;margin-top:40px;width:200px;height:200px;border:2px solid black;" alt="Employees List">
-	</a>
-	<br>
-	<a href="reports/sales_report.php" title="View Transactions">
-	<img src="../../assets/images/common/moneyicon.png" style="padding:8px;margin-left:550px;margin-top:40px;width:200px;height:200px;border:2px solid black;" alt="Transactions List">
-	</a>
-	
-	<a href="reports/stock_report.php" title="Low Stock Alert">
-	<img src="../../assets/images/admin/alert.png" style="padding:8px;margin-left:100px;margin-top:40px;width:200px;height:200px;border:2px solid black;" alt="Low Stock Report">
-	</a>
+	<div class="main-content">
+		<div class="dashboard-cards">
+			<a href="sales/pos1.php" class="dashboard-card" title="Add New Sale">
+				<img src="../../assets/images/admin/carticon1.png" alt="Add New Sale">
+				<span>Point of Sale</span>
+			</a>
+			
+			<a href="inventory/view.php" class="dashboard-card" title="View Inventory">
+				<img src="../../assets/images/common/inventory.png" alt="Inventory">
+				<span>View Inventory</span>
+			</a>
+			
+			<a href="employees/view.php" class="dashboard-card" title="View Employees">
+				<img src="../../assets/images/admin/emp.png" alt="Employees List">
+				<span>Manage Employees</span>
+			</a>
+
+			<a href="reports/sales_report.php" class="dashboard-card" title="View Transactions">
+				<img src="../../assets/images/common/moneyicon.png" alt="Transactions List">
+				<span>Sales Reports</span>
+			</a>
+			
+			<a href="reports/stock_report.php" class="dashboard-card" title="Low Stock Alert">
+				<img src="../../assets/images/admin/alert.png" alt="Low Stock Report">
+				<span>Low Stock Alert</span>
+			</a>
+		</div>
+	</div>
 	
 	
 </body>

@@ -3,8 +3,8 @@
 
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="nav2.css">
-<link rel="stylesheet" type="text/css" href="table1.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
+<link rel="stylesheet" type="text/css" href="../../../assets/css/table.css">
 <title>
 Employees
 </title>
@@ -12,7 +12,7 @@ Employees
 
 <body>
 <?php 
-require('./admin_sidebar.php');
+require('../sidebar.php');
 ?>
 	<center>
 	<div class="head">
@@ -39,7 +39,7 @@ require('./admin_sidebar.php');
 		
 	<?php
 	
-	include "config.php";
+	include "../../../config/config.php";
 	$sql = "SELECT e_id, e_fname, e_lname, bdate, e_age, e_sex, e_type, e_jdate, e_sal, e_phno, e_mail, e_add FROM employee where e_id<>1";
 	$result = $conn->query($sql);
 	
@@ -61,8 +61,8 @@ require('./admin_sidebar.php');
 		echo "<td>" . $row["e_mail"]. "</td>";
 		echo "<td>" . $row["e_add"]. "</td>";
 		echo "<td align=center>";
-		echo "<a class='button1 edit-btn' href=employee-update.php?id=".$row['e_id'].">Edit</a>";
-		echo "<a onclick='return confirm('Are you sure to delete?');' class='button1 del-btn' href=employee-delete.php?id=".$row['e_id'].">Delete</a>";
+		echo "<a class='button1 edit-btn' href='update.php?id=".$row['e_id']."'>Edit</a>";
+		echo "<a onclick=\"return confirm('Are you sure to delete?');\" class='button1 del-btn' href='delete.php?id=".$row['e_id']."'>Delete</a>";
 		echo "</td>";
 	echo "</tr>";
 	}
