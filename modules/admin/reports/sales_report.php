@@ -1,165 +1,151 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="../../../assets/css/nav.css">
-<link rel="stylesheet" type="text/css" href="../../../assets/css/table.css">
-<link rel="stylesheet" type="text/css" href="../../../assets/css/form.css">
-<title>
-Reports
-</title>
-<style>
-body {font-family:Arial;}
-</style>
+    <meta charset="UTF-8">
+    <title>Transaction Reports - PHARMACIA</title>
 </head>
+<body class="bg-slate-50">
+    <?php require('../sidebar.php'); ?>
 
-<body>
+    <div class="mb-10 flex flex-col md:flex-row md:items-center justify-between">
+        <div>
+            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Transaction Reports</h2>
+            <p class="text-slate-500 mt-1 font-medium">Analyze financial performance and movement records.</p>
+        </div>
+    </div>
 
-	<?php require('../sidebar.php'); ?>
-	
-	<center>
-	<div class="head">
-	<h2> TRANSACTION REPORTS</h2>
-	</div>
-	
-	<br><br><br><br><br><br><br><br><br>
-	
-			<form action="<?=$_SERVER['PHP_SELF']?>" method="post">
-					<p>
-						<label for="start">Start Date:</label>
-						<input type="date" name="start">
-					</p>
-					<p>
-						<label for="end">End Date:</label>
-						<input type="date" name="end">
-					</p>
-				
-			<input type="submit" name="submit" value="View Records">
-			</form>	
-	
-	<?php
-	include "../../../config/config.php";
-		if(isset($_POST['submit'])) {
-			
-			$start=$_POST['start'];
-			$end=$_POST['end'];
-			$res=mysqli_query($conn,"SELECT SUM(p_cost) AS PAMT FROM purchase WHERE pur_date >= '$start' AND pur_date <= '$end'") or die(mysqli_error($conn));
-			while($row=mysqli_fetch_array($res))
-			{
-				$pamt=$row['PAMT'] ?? 0;
-				
-			}
-			
-			$res=mysqli_query($conn,"SELECT SUM(total_amt) AS SAMT FROM sales WHERE s_date >= '$start' AND s_date <= '$end';") or die(mysqli_error($conn));
-			while($row=mysqli_fetch_array($res))
-			{
-				$samt=$row['SAMT'] ?? 0;
-				
-			} 
-			
-			$profit = $samt - $pamt;
-			$profits = number_format($profit, 2);
-	?>
-			
-		<table align="right" id="table1" style="margin-right:100px;">
-			<tr>
-				<th>Purchase ID</th>
-				<th>Supplier ID</th>
-				<th>Medicine ID</th>
-				
-				<th>Quantity</th>
-				<th>Date of Purchase</th>
-				<th>Cost of Purchase(in Rs)</th>
-			</tr>
-	<?php
-	$sql = "SELECT p_id,sup_id,med_id,p_qty,p_cost,pur_date FROM purchase 
-			WHERE pur_date >= '$start' AND pur_date <= '$end';";
-	$result = $conn->query($sql);
-	if ($result->num_rows > 0) {
-	
-		while($row = $result->fetch_assoc()) {
-			
-		echo "<tr>";
-			echo "<td>" . $row["p_id"]. "</td>";
-			echo "<td>" . $row["sup_id"]. "</td>";
-			echo "<td>" . $row["med_id"]. "</td>";
-			echo "<td>" . $row["p_qty"]. "</td>";
-			echo "<td>" . $row["pur_date"]. "</td>";
-			echo "<td>" . $row["p_cost"]. "</td>";
-			
-		echo "</tr>";
-		}
-	}
-	
-	echo "<tr>";
-	echo "<td colspan=5>Total</td>";
-	echo"<td >Rs.".$pamt."</td>";
-	echo "</tr>";
-	echo "</table>";
-	echo "</table>";
-	?>	
-	
-	<table align="right" id="table1" style="margin-right:100px;">
-		<tr>
-			<th>Sale ID</th>
-			<th>Customer ID</th>
-			<th>Employee ID</th>
-			<th>Date</th>
-			<th>Sale Amount(in Rs)</th>
-		</tr>
-	
-	<?php
-	include "../../../config/config.php";
-	$sql = "SELECT sale_id, c_id,s_date,s_time,total_amt,e_id FROM sales
-			WHERE s_date >= '$start' AND s_date <= '$end';";
-	$result = $conn->query($sql);
-	if ($result->num_rows > 0) {
-	
-		while($row = $result->fetch_assoc()) {
-			
-			
-		echo "<tr>";
-			echo "<td>" . $row["sale_id"]. "</td>";
-			echo "<td>" . $row["c_id"] . "</td>";
-			echo "<td>" . $row["e_id"]. "</td>";
-			echo "<td>" . $row["s_date"]."</td>";
-			echo "<td>" . $row["total_amt"]. "</td>";
-			
-		echo "</tr>";
-		}
-	echo "<tr>";
-	echo "<td colspan=4>Total</td>";
-	echo"<td >Rs.".$samt."</td>";
-	echo "</tr>";
-	echo "</table>";
-	}
-	?>
-	
-	<table align="right" id="table1" style="margin-bottom:100px;margin-right:100px;">
-	<tr style="background-color: #f2f2f2;" >
-		<td>Transaction Amount </td>
-				<td>Rs.<?php echo $profits; }?></td>
-	</tr>
-	</table>
-					
+    <!-- Date Range Picker Card -->
+    <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm mb-12 max-w-2xl">
+        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">Select Date Range</h3>
+        <form action="<?=$_SERVER['PHP_SELF']?>" method="post" class="flex flex-col sm:flex-row items-end space-y-4 sm:space-y-0 sm:space-x-4">
+            <div class="flex-grow w-full">
+                <label class="block text-xs font-bold text-slate-500 mb-2 uppercase">Start Date</label>
+                <input type="date" name="start" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-bold" />
+            </div>
+            <div class="flex-grow w-full">
+                <label class="block text-xs font-bold text-slate-500 mb-2 uppercase">End Date</label>
+                <input type="date" name="end" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-bold" />
+            </div>
+            <button type="submit" name="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 whitespace-nowrap">
+                Generate Analysis
+            </button>
+        </form>
+    </div>
+
+    <?php
+    include "../../../config/config.php";
+    if(isset($_POST['submit'])) {
+        $start=$_POST['start'];
+        $end=$_POST['end'];
+        
+        $res=mysqli_query($conn,"SELECT SUM(p_cost) AS PAMT FROM purchase WHERE pur_date >= '$start' AND pur_date <= '$end'") or die(mysqli_error($conn));
+        $row=mysqli_fetch_array($res);
+        $pamt=$row['PAMT'] ?? 0;
+
+        $res=mysqli_query($conn,"SELECT SUM(total_amt) AS SAMT FROM sales WHERE s_date >= '$start' AND s_date <= '$end';") or die(mysqli_error($conn));
+        $row=mysqli_fetch_array($res);
+        $samt=$row['SAMT'] ?? 0;
+
+        $profit = $samt - $pamt;
+        $profitColor = $profit >= 0 ? 'text-emerald-600' : 'text-red-600';
+    ?>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+            <p class="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">Total Purchases</p>
+            <p class="text-3xl font-black text-slate-900">Rs. <?php echo number_format($pamt, 2); ?></p>
+        </div>
+        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+            <p class="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">Total Revenue</p>
+            <p class="text-3xl font-black text-blue-600">Rs. <?php echo number_format($samt, 2); ?></p>
+        </div>
+        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+            <p class="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">Net Performance</p>
+            <p class="text-3xl font-black <?php echo $profitColor; ?>">Rs. <?php echo number_format($profit, 2); ?></p>
+        </div>
+    </div>
+
+    <div class="space-y-12">
+        <!-- Purchases Table -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-8 py-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <h4 class="font-black text-slate-900 uppercase tracking-tight text-sm">Purchase Ledger</h4>
+                <span class="bg-slate-200 px-3 py-1 rounded-full text-[10px] font-black"><?php echo $start; ?> to <?php echo $end; ?></span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                            <th class="px-8 py-4">P-ID</th>
+                            <th class="px-8 py-4">Med-ID</th>
+                            <th class="px-8 py-4">Qty</th>
+                            <th class="px-8 py-4 text-right">Cost (Rs)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        <?php
+                        $sql = "SELECT p_id, sup_id, med_id, p_qty, p_cost, pur_date FROM purchase WHERE pur_date >= '$start' AND pur_date <= '$end';";
+                        $result = $conn->query($sql);
+                        if ($result && $result->num_rows > 0) {
+                            while($row = $result->fetch_assoc()) {
+                                echo "<tr class='hover:bg-slate-50/50 transition-colors'>";
+                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-400'>#".$row["p_id"]."</td>";
+                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-900'>#".$row["med_id"]."</td>";
+                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-600'>".$row["p_qty"]."</td>";
+                                echo "<td class='px-8 py-4 text-xs font-black text-slate-900 text-right'>".number_format($row["p_cost"], 2)."</td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='4' class='px-8 py-8 text-center text-slate-400 text-xs font-bold uppercase'>No records found</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sales Table -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-8 py-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <h4 class="font-black text-slate-900 uppercase tracking-tight text-sm">Sales Ledger</h4>
+                <span class="bg-slate-200 px-3 py-1 rounded-full text-[10px] font-black">Settled Transactions</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                            <th class="px-8 py-4">S-ID</th>
+                            <th class="px-8 py-4">C-ID</th>
+                            <th class="px-8 py-4 text-right">Amount (Rs)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        <?php
+                        $sql = "SELECT sale_id, c_id, total_amt FROM sales WHERE s_date >= '$start' AND s_date <= '$end';";
+                        $result = $conn->query($sql);
+                        if ($result && $result->num_rows > 0) {
+                            while($row = $result->fetch_assoc()) {
+                                echo "<tr class='hover:bg-slate-50/50 transition-colors'>";
+                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-400'>#".$row["sale_id"]."</td>";
+                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-900'>#".$row["c_id"]."</td>";
+                                echo "<td class='px-8 py-4 text-xs font-black text-blue-600 text-right'>".number_format($row["total_amt"], 2)."</td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='3' class='px-8 py-8 text-center text-slate-400 text-xs font-bold uppercase'>No records found</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <?php } // End if submit ?>
+
+    <!-- closing sidebar tags -->
+    </main>
+    </div>
+    </div>
 </body>
-
-<script>
-		var dropdown = document.getElementsByClassName("dropdown-btn");
-		var i;
-
-			for (i = 0; i < dropdown.length; i++) {
-			  dropdown[i].addEventListener("click", function() {
-			  this.classList.toggle("active");
-			  var dropdownContent = this.nextElementSibling;
-			  if (dropdownContent.style.display === "block") {
-			  dropdownContent.style.display = "none";
-			  } else {
-			  dropdownContent.style.display = "block";
-			  }
-			  });
-			}
-</script>
-
 </html>
