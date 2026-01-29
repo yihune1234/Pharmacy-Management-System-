@@ -60,41 +60,41 @@ $customers = $conn->query($sql);
                         <?php while($row = $customers->fetch_assoc()): ?>
                             <tr class="hover:bg-slate-50/80 transition-all group">
                                 <td class="px-10 py-6">
-                                    <span class="text-[10px] font-black text-slate-400">#UID-<?php echo $row["c_id"]; ?></span>
+                                    <span class="text-[10px] font-black text-slate-400">#UID-<?php echo $row["C_ID"]; ?></span>
                                 </td>
                                 <td class="px-10 py-6">
                                     <div class="flex items-center space-x-3">
                                         <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center font-black text-xs">
-                                            <?php echo strtoupper(substr($row["c_fname"], 0, 1) . substr($row["c_lname"], 0, 1)); ?>
+                                            <?php echo strtoupper(substr($row["C_Fname"], 0, 1) . substr($row["C_Lname"], 0, 1)); ?>
                                         </div>
                                         <div class="flex flex-col">
-                                            <span class="text-sm font-black text-slate-900 group-hover:text-emerald-600 transition-colors tracking-tight"><?php echo htmlspecialchars($row["c_fname"] . ' ' . $row["c_lname"]); ?></span>
+                                            <span class="text-sm font-black text-slate-900 group-hover:text-emerald-600 transition-colors tracking-tight"><?php echo htmlspecialchars($row["C_Fname"] . ' ' . $row["C_Lname"]); ?></span>
                                             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Verified Patient</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-10 py-6">
                                     <div class="flex items-center space-x-2">
-                                        <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black tracking-widest"><?php echo $row["c_age"]; ?> YRS</span>
-                                        <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black tracking-widest uppercase"><?php echo $row["c_sex"]; ?></span>
+                                        <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black tracking-widest"><?php echo $row["C_Age"]; ?> YRS</span>
+                                        <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black tracking-widest uppercase"><?php echo $row["C_Sex"]; ?></span>
                                     </div>
                                 </td>
                                 <td class="px-10 py-6">
                                     <div class="flex flex-col space-y-1">
                                         <span class="text-xs font-bold text-slate-700 flex items-center">
-                                            <i class="fas fa-phone-alt text-[10px] text-slate-400 mr-2"></i> <?php echo $row["c_phno"]; ?>
+                                            <i class="fas fa-phone-alt text-[10px] text-slate-400 mr-2"></i> <?php echo $row["C_Phno"]; ?>
                                         </span>
                                         <span class="text-[10px] font-medium text-slate-400">
-                                            <i class="fas fa-envelope text-[10px] text-slate-300 mr-2"></i> <?php echo $row["c_mail"]; ?>
+                                            <i class="fas fa-envelope text-[10px] text-slate-300 mr-2"></i> <?php echo $row["C_Mail"]; ?>
                                         </span>
                                     </div>
                                 </td>
                                 <td class="px-10 py-6">
                                     <div class="flex items-center justify-center space-x-2">
-                                        <a href="update.php?id=<?php echo $row['c_id']; ?>" class="w-9 h-9 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                                        <a href="update.php?id=<?php echo $row['C_ID']; ?>" class="w-9 h-9 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm">
                                             <i class="fas fa-user-pen text-xs"></i>
                                         </a>
-                                        <a href="delete.php?id=<?php echo $row['c_id']; ?>" onclick="return confirm('Erase patient profile and history?')" class="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all shadow-sm">
+                                        <a href="delete.php?id=<?php echo $row['C_ID']; ?>" onclick="return confirm('Erase patient profile and history?')" class="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all shadow-sm">
                                             <i class="fas fa-user-xmark text-xs"></i>
                                         </a>
                                     </div>

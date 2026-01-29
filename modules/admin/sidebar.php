@@ -182,7 +182,7 @@ $low_stock = $low_stock_result->fetch_assoc()['count'] ?? 0;
                         <p class="text-xs font-bold text-slate-900 truncate"><?php echo htmlspecialchars($_SESSION['name']); ?></p>
                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Chief Administrator</p>
                     </div>
-                    <a href="../auth/logout.php" class="text-slate-400 hover:text-rose-500 transition-colors">
+                    <a href="<?php echo $path; ?>../auth/logout.php" class="text-slate-400 hover:text-rose-500 transition-colors">
                         <i class="fas fa-power-off text-sm"></i>
                     </a>
                 </div>

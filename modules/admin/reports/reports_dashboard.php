@@ -7,26 +7,40 @@ require_once __DIR__ . '/../../../includes/session_check.php';
 require_admin();
 validate_role_area('admin');
 
-// Get reporting data
-$daily_sales = $conn->query("SELECT S_Date, COUNT(*) as Total_Bills, SUM(Total_Amt) as Total_Sales FROM sales GROUP BY S_Date ORDER BY S_Date DESC LIMIT 30");
-
-$inventory_status = $conn->query("
+// 1. Total Medicines and Low Stock (from meds table)
+$meds_stats = $conn->query("
     SELECT 
         COUNT(*) as total_medicines,
-        SUM(CASE WHEN Med_Qty <= 10 THEN 1 ELSE 0 END) as low_stock_count,
-        SUM(CASE WHEN Exp_Date <= CURDATE() THEN 1 ELSE 0 END) as expired_count
+        SUM(CASE WHEN Med_Qty <= 10 THEN 1 ELSE 0 END) as low_stock_count
     FROM meds
 ")->fetch_assoc();
 
+// 2. Expired Count (from purchase table, where individual batches are tracked)
+$expired_stats = $conn->query("
+    SELECT COUNT(DISTINCT Med_ID) as expired_count 
+    FROM purchase 
+    WHERE exp_date <= CURDATE()
+")->fetch_assoc();
+
+$inventory_status = [
+    'total_medicines' => $meds_stats['total_medicines'] ?? 0,
+    'low_stock_count' => $meds_stats['low_stock_count'] ?? 0,
+    'expired_count' => $expired_stats['expired_count'] ?? 0
+];
+
+// 3. Expiry Alerts (Join meds and purchase)
 $expiry_alerts = $conn->query("
-    SELECT Med_Name, Exp_Date, Med_Qty, Location_Rack
-    FROM meds
-    WHERE Exp_Date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
-    ORDER BY Exp_Date ASC
+    SELECT m.Med_Name, p.exp_date as Exp_Date, m.Med_Qty, m.Location_Rack
+    FROM meds m
+    JOIN purchase p ON m.Med_ID = p.Med_ID
+    WHERE p.exp_date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+    GROUP BY m.Med_ID, m.Med_Name, p.exp_date, m.Med_Qty, m.Location_Rack
+    ORDER BY p.exp_date ASC
     LIMIT 5
 ");
 
-$low_stock = $conn->query("
+// 4. Low Stock Alerts
+$low_stock_alerts = $conn->query("
     SELECT Med_Name, Med_Qty, Location_Rack
     FROM meds
     WHERE Med_Qty <= 10
@@ -101,14 +115,14 @@ $low_stock = $conn->query("
                 <span class="px-3 py-1 bg-rose-100 text-rose-600 text-[9px] font-black rounded-lg uppercase tracking-widest">High Priority</span>
             </div>
             <div class="space-y-4">
-                <?php if ($low_stock && $low_stock->num_rows > 0): ?>
-                    <?php while($item = $low_stock->fetch_assoc()): ?>
+                <?php if ($low_stock_alerts && $low_stock_alerts->num_rows > 0): ?>
+                    <?php while($item = $low_stock_alerts->fetch_assoc()): ?>
                         <div class="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl border border-slate-100 group hover:border-rose-200 transition-all">
                             <div class="flex items-center space-x-4">
                                 <div class="w-1.5 h-8 bg-rose-500 rounded-full"></div>
                                 <div class="flex flex-col">
                                     <span class="text-sm font-black text-slate-900"><?php echo htmlspecialchars($item['Med_Name']); ?></span>
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase"><?php echo $item['Location_Rack']; ?></span>
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase"><?php echo htmlspecialchars($item['Location_Rack']); ?></span>
                                 </div>
                             </div>
                             <span class="text-sm font-black text-rose-600"><?php echo $item['Med_Qty']; ?> Left</span>
@@ -155,14 +169,14 @@ $low_stock = $conn->query("
             <h4 class="text-lg font-black text-slate-900 uppercase tracking-tight mb-2">Sales Analytics</h4>
             <p class="text-xs text-slate-500 font-medium">Deep dive into transactional high-frequency data logs.</p>
         </a>
-        <a href="inventory_report.php" class="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all">
+        <a href="stock_report.php" class="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all">
             <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-all">
                 <i class="fas fa-boxes-packing text-xl"></i>
             </div>
             <h4 class="text-lg font-black text-slate-900 uppercase tracking-tight mb-2">Stock Fidelity</h4>
             <p class="text-xs text-slate-500 font-medium">Verify asset counts and storage location precision matrix.</p>
         </a>
-        <a href="employee_performance.php" class="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all">
+        <a href="../employees/view_new.php" class="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all">
             <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-all">
                 <i class="fas fa-user-gear text-xl"></i>
             </div>

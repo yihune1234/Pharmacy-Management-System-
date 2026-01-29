@@ -32,17 +32,17 @@ Reports
 	<?php
 	
 	include "../../../config/config.php";
-	$result=mysqli_query($conn,"SELECT med_id, med_name, med_qty, category, med_price FROM meds WHERE med_qty < 50;");
+	$result=mysqli_query($conn,"SELECT Med_ID, Med_Name, Med_Qty, Category, Med_Price FROM meds WHERE Med_Qty < 50;");
 	if ($result->num_rows > 0) {
 	
 	while($row = $result->fetch_assoc()) {
 
 	echo "<tr>";
-		echo "<td>" . $row["med_id"]. "</td>";
-		echo "<td>" . $row["med_name"] . "</td>";
-		echo "<td style='color:red;'>" . $row["med_qty"]. "</td>";
-		echo "<td>" . $row["category"]. "</td>";
-		echo "<td>" . $row["med_price"] . "</td>";
+		echo "<td>" . $row["Med_ID"]. "</td>";
+		echo "<td>" . $row["Med_Name"] . "</td>";
+		echo "<td style='color:red;'>" . $row["Med_Qty"]. "</td>";
+		echo "<td>" . $row["Category"]. "</td>";
+		echo "<td>" . $row["Med_Price"] . "</td>";
 	echo "</tr>";
 	}
 	echo "</table>";

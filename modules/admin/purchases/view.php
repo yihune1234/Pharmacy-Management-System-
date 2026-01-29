@@ -64,32 +64,32 @@ $purchases = $conn->query($sql);
                         <?php while($row = $purchases->fetch_assoc()): ?>
                             <tr class="hover:bg-slate-50/80 transition-all group">
                                 <td class="px-10 py-6">
-                                    <span class="text-[10px] font-black text-slate-400">#ACQ-<?php echo $row["p_id"]; ?></span>
+                                    <span class="text-[10px] font-black text-slate-400">#ACQ-<?php echo $row["P_ID"]; ?></span>
                                 </td>
                                 <td class="px-10 py-6">
                                     <div class="flex flex-col">
                                         <span class="text-sm font-black text-slate-900 group-hover:text-indigo-600 transition-colors tracking-tight"><?php echo htmlspecialchars($row["Med_Name"]); ?></span>
-                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Mfg: <?php echo date('M Y', strtotime($row["mfg_date"])); ?> | Exp: <?php echo date('M Y', strtotime($row["exp_date"])); ?></span>
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Mfg: <?php echo isset($row["Mfg_Date"]) ? date('M Y', strtotime($row["Mfg_Date"])) : 'N/A'; ?> | Exp: <?php echo isset($row["Exp_Date"]) ? date('M Y', strtotime($row["Exp_Date"])) : 'N/A'; ?></span>
                                     </div>
                                 </td>
                                 <td class="px-10 py-6">
                                     <div class="flex items-center space-x-3">
-                                        <span class="text-xs font-black text-slate-700 bg-indigo-50 px-3 py-1 rounded-lg"><?php echo $row["p_qty"]; ?> Units</span>
-                                        <span class="text-sm font-black text-slate-900 tracking-tight">Rs. <?php echo number_format($row["p_cost"], 2); ?></span>
+                                        <span class="text-xs font-black text-slate-700 bg-indigo-50 px-3 py-1 rounded-lg"><?php echo $row["P_Qty"]; ?> Units</span>
+                                        <span class="text-sm font-black text-slate-900 tracking-tight">Rs. <?php echo number_format($row["P_Cost"], 2); ?></span>
                                     </div>
                                 </td>
                                 <td class="px-10 py-6">
                                     <div class="flex flex-col">
-                                        <span class="text-xs font-bold text-slate-600"><?php echo date('D, j M Y', strtotime($row["pur_date"])); ?></span>
+                                        <span class="text-xs font-bold text-slate-600"><?php echo date('D, j M Y', strtotime($row["Pur_Date"])); ?></span>
                                         <span class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Entry Logged</span>
                                     </div>
                                 </td>
                                 <td class="px-10 py-6">
                                     <div class="flex items-center justify-center space-x-2">
-                                        <a href="update.php?pid=<?php echo $row['p_id']; ?>&sid=<?php echo $row['sup_id']; ?>&mid=<?php echo $row['med_id']; ?>" class="w-9 h-9 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                                        <a href="update.php?pid=<?php echo $row['P_ID']; ?>&sid=<?php echo $row['Sup_ID']; ?>&mid=<?php echo $row['Med_ID']; ?>" class="w-9 h-9 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm">
                                             <i class="fas fa-file-pen text-xs"></i>
                                         </a>
-                                        <a href="delete.php?pid=<?php echo $row['p_id']; ?>&sid=<?php echo $row['sup_id']; ?>&mid=<?php echo $row['med_id']; ?>" onclick="return confirm('Purge acquisition record?')" class="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all shadow-sm">
+                                        <a href="delete.php?pid=<?php echo $row['P_ID']; ?>&sid=<?php echo $row['Sup_ID']; ?>&mid=<?php echo $row['Med_ID']; ?>" onclick="return confirm('Purge acquisition record?')" class="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all shadow-sm">
                                             <i class="fas fa-trash-can text-xs"></i>
                                         </a>
                                     </div>

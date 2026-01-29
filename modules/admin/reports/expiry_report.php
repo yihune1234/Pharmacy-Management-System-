@@ -35,20 +35,20 @@ require('../sidebar.php');
 	<?php
 	
 		include "../../../config/config.php";
-		$result=mysqli_query($conn,"SELECT p_id, sup_id, med_id, p_qty, p_cost, pur_date, mfg_date, exp_date FROM purchase WHERE exp_date <= DATE_ADD(CURDATE(), INTERVAL 6 MONTH) AND exp_date >= CURDATE();");
+		$result=mysqli_query($conn,"SELECT P_ID, Sup_ID, Med_ID, P_Qty, P_Cost, Pur_Date, Mfg_Date, Exp_Date FROM purchase WHERE Exp_Date <= DATE_ADD(CURDATE(), INTERVAL 6 MONTH) AND Exp_Date >= CURDATE();");
 		if ($result->num_rows > 0) { 
 
 		while($row = $result->fetch_assoc()) {
 			
 		echo "<tr>";
-			echo "<td>" . $row["p_id"]. "</td>";
-			echo "<td>" . $row["sup_id"]. "</td>";
-			echo "<td>" . $row["med_id"]. "</td>";
-			echo "<td>" . $row["p_qty"]. "</td>";
-			echo "<td>" . $row["p_cost"]. "</td>";
-			echo "<td>" . $row["pur_date"]. "</td>";
-			echo "<td>" . $row["mfg_date"] . "</td>";
-			echo "<td style='color:red;'>" . $row["exp_date"]. "</td>";
+			echo "<td>" . $row["P_ID"]. "</td>";
+			echo "<td>" . $row["Sup_ID"]. "</td>";
+			echo "<td>" . $row["Med_ID"]. "</td>";
+			echo "<td>" . $row["P_Qty"]. "</td>";
+			echo "<td>" . $row["P_Cost"]. "</td>";
+			echo "<td>" . $row["Pur_Date"]. "</td>";
+			echo "<td>" . $row["Mfg_Date"] . "</td>";
+			echo "<td style='color:red;'>" . $row["Exp_Date"]. "</td>";
 		echo "</tr>";
 		}
 		echo "</table>";

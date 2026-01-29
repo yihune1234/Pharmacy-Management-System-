@@ -41,7 +41,7 @@ if (isset($_POST['add_employee'])) {
             $username = $new_username;
         }
         
-        $sql = "INSERT INTO employee (E_Fname, E_Lname, E_Email, E_Phno, E_Add, E_Type, E_Sal, E_Username, E_Password, E_Bdate, E_Sex, E_Jdate) 
+        $sql = "INSERT INTO employee (E_Fname, E_Lname, E_Mail, E_Phno, E_Add, E_Type, E_Sal, E_Username, E_Password, E_Bdate, E_Sex, E_Jdate) 
                 VALUES ('$fname', '$lname', '$email', '$phone', '$address', '$position', $salary, '$username', '$hashed_password', '$dob', '$gender', CURDATE())";
         
         if ($conn->query($sql)) {

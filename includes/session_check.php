@@ -3,6 +3,7 @@
  * Session Validation Middleware
  * Provides secure session management and role-based access control
  */
+require_once __DIR__ . '/alerts.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

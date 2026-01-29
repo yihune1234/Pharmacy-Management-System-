@@ -13,15 +13,12 @@ if (isset($_POST['add'])) {
     $category = $conn->real_escape_string($_POST['cat']);
     $sprice   = (float)$_POST['sp'];
     $location = $conn->real_escape_string($_POST['loc']);
-    $barcode  = $conn->real_escape_string($_POST['barcode'] ?? '');
-    $min_stock = (int)($_POST['min_stock'] ?? 10);
 
     if (empty($name) || empty($category)) {
         set_flash_message("Operational failure: Required fields missing.", "error");
     } else {
-        $barcode_clause = !empty($barcode) ? "'$barcode'" : "NULL";
-        $sql = "INSERT INTO meds (Med_Name, Med_Qty, Category, Med_Price, Location_Rack, Barcode, Min_Stock_Level) 
-                VALUES ('$name', $qty, '$category', $sprice, '$location', $barcode_clause, $min_stock)";
+        $sql = "INSERT INTO meds (Med_Name, Med_Qty, Category, Med_Price, Location_Rack) 
+                VALUES ('$name', $qty, '$category', $sprice, '$location')";
         
         if ($conn->query($sql)) {
             set_flash_message("Asset '$name' successfully integrated into synchronization.", "success");
@@ -73,26 +70,6 @@ if (isset($_POST['add'])) {
                             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Official Asset Name</label>
                             <input type="text" name="medname" placeholder="Enter pharmaceutical designation..." required
                                 class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all outline-none font-bold text-slate-700 placeholder:text-slate-300">
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div>
-                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Global Barcode</label>
-                                <div class="relative">
-                                    <i class="fas fa-barcode absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                                    <input type="text" name="barcode" placeholder="UPC/EAN Format..."
-                                        class="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-6 py-5 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all outline-none font-bold text-slate-700 placeholder:text-slate-300">
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Critical Threshold</label>
-                                <div class="relative">
-                                    <i class="fas fa-bell absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                                    <input type="number" name="min_stock" value="10"
-                                        class="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-6 py-5 focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 focus:bg-white transition-all outline-none font-bold text-slate-700">
-                                </div>
-                            </div>
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">

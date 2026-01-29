@@ -9,8 +9,8 @@ validate_role_area('admin');
 
 // Get search query
 $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
-$where = $search ? "WHERE sup_name LIKE '%$search%' OR sup_add LIKE '%$search%'" : "";
-$sql = "SELECT * FROM suppliers $where ORDER BY sup_name";
+$where = $search ? "WHERE Sup_Name LIKE '%$search%' OR Sup_Add LIKE '%$search%'" : "";
+$sql = "SELECT * FROM suppliers $where ORDER BY Sup_Name";
 $suppliers = $conn->query($sql);
 ?>
 <!DOCTYPE html>
@@ -60,7 +60,7 @@ $suppliers = $conn->query($sql);
                         <?php while($row = $suppliers->fetch_assoc()): ?>
                             <tr class="hover:bg-slate-50/80 transition-all group">
                                 <td class="px-10 py-6">
-                                    <span class="text-[10px] font-black text-slate-400">#SUP-<?php echo $row["sup_id"]; ?></span>
+                                    <span class="text-[10px] font-black text-slate-400">#SUP-<?php echo $row["Sup_ID"]; ?></span>
                                 </td>
                                 <td class="px-10 py-6">
                                     <div class="flex items-center space-x-3">
@@ -68,32 +68,32 @@ $suppliers = $conn->query($sql);
                                             <i class="fas fa-industry text-xs"></i>
                                         </div>
                                         <div class="flex flex-col">
-                                            <span class="text-sm font-black text-slate-900 group-hover:text-amber-600 transition-colors tracking-tight"><?php echo htmlspecialchars($row["sup_name"]); ?></span>
+                                            <span class="text-sm font-black text-slate-900 group-hover:text-amber-600 transition-colors tracking-tight"><?php echo htmlspecialchars($row["Sup_Name"]); ?></span>
                                             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Verified Vendor</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-10 py-6">
                                     <span class="text-xs font-bold text-slate-600 flex items-center">
-                                        <i class="fas fa-location-dot text-[10px] text-slate-400 mr-2"></i> <?php echo htmlspecialchars($row["sup_add"]); ?>
+                                        <i class="fas fa-location-dot text-[10px] text-slate-400 mr-2"></i> <?php echo htmlspecialchars($row["Sup_Add"]); ?>
                                     </span>
                                 </td>
                                 <td class="px-10 py-6">
                                     <div class="flex flex-col space-y-1">
                                         <span class="text-xs font-bold text-slate-700 flex items-center">
-                                            <i class="fas fa-phone-alt text-[10px] text-slate-400 mr-2"></i> <?php echo $row["sup_phno"]; ?>
+                                            <i class="fas fa-phone-alt text-[10px] text-slate-400 mr-2"></i> <?php echo $row["Sup_Phno"]; ?>
                                         </span>
                                         <span class="text-[10px] font-medium text-slate-400">
-                                            <i class="fas fa-at text-[10px] text-slate-300 mr-2"></i> <?php echo $row["sup_mail"]; ?>
+                                            <i class="fas fa-at text-[10px] text-slate-300 mr-2"></i> <?php echo $row["Sup_Mail"]; ?>
                                         </span>
                                     </div>
                                 </td>
                                 <td class="px-10 py-6">
                                     <div class="flex items-center justify-center space-x-2">
-                                        <a href="update.php?id=<?php echo $row['sup_id']; ?>" class="w-9 h-9 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                                        <a href="update.php?id=<?php echo $row['Sup_ID']; ?>" class="w-9 h-9 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm">
                                             <i class="fas fa-edit text-xs"></i>
                                         </a>
-                                        <a href="delete.php?id=<?php echo $row['sup_id']; ?>" onclick="return confirm('Terminate supplier partnership records?')" class="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all shadow-sm">
+                                        <a href="delete.php?id=<?php echo $row['Sup_ID']; ?>" onclick="return confirm('Terminate supplier partnership records?')" class="w-9 h-9 flex items-center justify-center rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all shadow-sm">
                                             <i class="fas fa-trash-alt text-xs"></i>
                                         </a>
                                     </div>

@@ -38,11 +38,11 @@
         $start=$_POST['start'];
         $end=$_POST['end'];
         
-        $res=mysqli_query($conn,"SELECT SUM(p_cost) AS PAMT FROM purchase WHERE pur_date >= '$start' AND pur_date <= '$end'") or die(mysqli_error($conn));
+        $res=mysqli_query($conn,"SELECT SUM(P_Cost) AS PAMT FROM purchase WHERE Pur_Date >= '$start' AND Pur_Date <= '$end'") or die(mysqli_error($conn));
         $row=mysqli_fetch_array($res);
         $pamt=$row['PAMT'] ?? 0;
 
-        $res=mysqli_query($conn,"SELECT SUM(total_amt) AS SAMT FROM sales WHERE s_date >= '$start' AND s_date <= '$end';") or die(mysqli_error($conn));
+        $res=mysqli_query($conn,"SELECT SUM(Total_Amt) AS SAMT FROM sales WHERE S_Date >= '$start' AND S_Date <= '$end';") or die(mysqli_error($conn));
         $row=mysqli_fetch_array($res);
         $samt=$row['SAMT'] ?? 0;
 
@@ -84,15 +84,15 @@
                     </thead>
                     <tbody class="divide-y divide-slate-50">
                         <?php
-                        $sql = "SELECT p_id, sup_id, med_id, p_qty, p_cost, pur_date FROM purchase WHERE pur_date >= '$start' AND pur_date <= '$end';";
+                        $sql = "SELECT P_ID, Sup_ID, Med_ID, P_Qty, P_Cost, Pur_Date FROM purchase WHERE Pur_Date >= '$start' AND Pur_Date <= '$end';";
                         $result = $conn->query($sql);
                         if ($result && $result->num_rows > 0) {
                             while($row = $result->fetch_assoc()) {
                                 echo "<tr class='hover:bg-slate-50/50 transition-colors'>";
-                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-400'>#".$row["p_id"]."</td>";
-                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-900'>#".$row["med_id"]."</td>";
-                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-600'>".$row["p_qty"]."</td>";
-                                echo "<td class='px-8 py-4 text-xs font-black text-slate-900 text-right'>".number_format($row["p_cost"], 2)."</td>";
+                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-400'>#".$row["P_ID"]."</td>";
+                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-900'>#".$row["Med_ID"]."</td>";
+                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-600'>".$row["P_Qty"]."</td>";
+                                echo "<td class='px-8 py-4 text-xs font-black text-slate-900 text-right'>".number_format($row["P_Cost"], 2)."</td>";
                                 echo "</tr>";
                             }
                         } else {
@@ -121,18 +121,18 @@
                     </thead>
                     <tbody class="divide-y divide-slate-50">
                         <?php
-                        $sql = "SELECT s.sale_id, s.total_amt, c.C_Fname, c.C_Lname 
+                        $sql = "SELECT s.Sale_ID, s.Total_Amt, c.C_Fname, c.C_Lname 
                                 FROM sales s 
-                                JOIN customer c ON s.c_id = c.C_ID 
-                                WHERE s.s_date >= '$start' AND s.s_date <= '$end';";
+                                JOIN customer c ON s.C_ID = c.C_ID 
+                                WHERE s.S_Date >= '$start' AND s.S_Date <= '$end';";
                         $result = $conn->query($sql);
                         if ($result && $result->num_rows > 0) {
                             while($row = $result->fetch_assoc()) {
                                 $name = $row['C_Fname'] . " " . $row['C_Lname'];
                                 echo "<tr class='hover:bg-slate-50/50 transition-colors'>";
-                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-400'>#".str_pad($row["sale_id"], 5, '0', STR_PAD_LEFT)."</td>";
+                                echo "<td class='px-8 py-4 text-xs font-bold text-slate-400'>#".str_pad($row["Sale_ID"], 5, '0', STR_PAD_LEFT)."</td>";
                                 echo "<td class='px-8 py-4 text-xs font-black text-slate-900'>".$name."</td>";
-                                echo "<td class='px-8 py-4 text-xs font-black text-blue-600 text-right'>".number_format($row["total_amt"], 2)."</td>";
+                                echo "<td class='px-8 py-4 text-xs font-black text-blue-600 text-right'>".number_format($row["Total_Amt"], 2)."</td>";
                                 echo "</tr>";
                             }
                         } else {

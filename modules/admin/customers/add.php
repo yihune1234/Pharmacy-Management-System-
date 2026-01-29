@@ -15,7 +15,7 @@ if (isset($_POST['add'])) {
     $phno = $conn->real_escape_string($_POST['phno']);
     $mail = $conn->real_escape_string($_POST['emid']);
 
-    $sql = "INSERT INTO customer (c_id, c_fname, c_lname, c_age, c_sex, c_phno, c_mail) 
+    $sql = "INSERT INTO customer (C_ID, C_Fname, C_Lname, C_Age, C_Sex, C_Phno, C_Mail) 
             VALUES ('$id', '$fname', '$lname', '$age', '$sex', '$phno', '$mail')";
     
     if ($conn->query($sql)) {

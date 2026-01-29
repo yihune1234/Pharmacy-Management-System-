@@ -16,7 +16,7 @@ if (isset($_POST['add'])) {
     $mdate = $conn->real_escape_string($_POST['mdate']);
     $edate = $conn->real_escape_string($_POST['edate']);
 
-    $sql = "INSERT INTO purchase (p_id, sup_id, med_id, p_qty, p_cost, pur_date, mfg_date, exp_date) 
+    $sql = "INSERT INTO purchase (P_ID, Sup_ID, Med_ID, P_Qty, P_Cost, Pur_Date, Mfg_Date, Exp_Date) 
             VALUES ('$pid', '$sid', '$mid', '$qty', '$cost', '$pdate', '$mdate', '$edate')";
     
     if ($conn->query($sql)) {

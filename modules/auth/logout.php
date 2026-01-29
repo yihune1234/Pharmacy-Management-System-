@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/session_check.php';
+require_once __DIR__ . '/../includes/alerts.php';
 
 // Destroy session completely
 session_unset();
