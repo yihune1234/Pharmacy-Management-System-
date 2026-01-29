@@ -1,13 +1,17 @@
 <?php
-		include "../../../config/config.php";
-	
-		if(isset($_GET['id']))
-		{
-			$id=$_GET['id'];
-			$qry1="SELECT * FROM suppliers WHERE sup_id='$id'";
-			$result = $conn->query($qry1);
-			$row = $result -> fetch_row();
-		}
+require_once __DIR__ . '/../../../config/config.php';
+require_once __DIR__ . '/../../../includes/alerts.php';
+require_once __DIR__ . '/../../../includes/session_check.php';
+
+// Validate admin access
+require_admin();
+
+if (isset($_GET['id'])) {
+    $id = $conn->real_escape_string($_GET['id']);
+    $qry1 = "SELECT * FROM suppliers WHERE Sup_ID = '$id'";
+    $result = $conn->query($qry1);
+    $row = $result->fetch_row();
+}
 ?>
 
 <!DOCTYPE html>
@@ -24,6 +28,7 @@ Suppliers
 </head>
 
 <body>
+    <?php render_flash_message(); ?>
 
 	<?php require('../sidebar.php'); ?>
 	
@@ -71,19 +76,22 @@ Suppliers
 			</form>
 			
 	<?php
-		 if( isset($_POST['update']))
-		 {
-			$id = $_POST['sid'];
-			$name = $_POST['sname'];
-			$add = $_POST['sadd'];
-			$phno = $_POST['sphno'];
-			$mail = $_POST['smail'];
+		if (isset($_POST['update'])) {
+		    $id = $conn->real_escape_string($_POST['sid']);
+		    $name = $conn->real_escape_string($_POST['sname']);
+		    $add = $conn->real_escape_string($_POST['sadd']);
+		    $phno = $conn->real_escape_string($_POST['sphno']);
+		    $mail = $conn->real_escape_string($_POST['smail']);
 			 
-		$sql="UPDATE suppliers SET sup_name='$name',sup_add='$add',sup_phno='$phno',sup_mail='$mail' where sup_id='$id'";
-		if ($conn->query($sql))
-		header("location:view.php");
-		else
-		echo "<p style='font-size:8; color:red;'>Error! Unable to update.</p>";
+		    $sql = "UPDATE suppliers SET Sup_Name='$name', Sup_Add='$add', Sup_Phno='$phno', Sup_Mail='$mail' WHERE Sup_ID='$id'";
+		    
+		    if ($conn->query($sql)) {
+		        set_flash_message("Supplier details updated successfully.", "success");
+		        header("Location: view.php");
+		        exit();
+		    } else {
+		        set_flash_message("Unable to update supplier details.", "error");
+		    }
 		}
 
 	?>

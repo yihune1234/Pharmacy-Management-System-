@@ -1,13 +1,17 @@
 <?php
-	include "../../../config/config.php";
-	
-	if(isset($_GET['id']))
-	{
-		$id=$_GET['id'];
-		$qry1="SELECT * FROM meds WHERE med_id='$id'";
-		$result = $conn->query($qry1);
-		$row = $result -> fetch_row();
-	}
+require_once __DIR__ . '/../../../config/config.php';
+require_once __DIR__ . '/../../../includes/alerts.php';
+require_once __DIR__ . '/../../../includes/session_check.php';
+
+// Validate admin access
+require_admin();
+
+if (isset($_GET['id'])) {
+    $id = $conn->real_escape_string($_GET['id']);
+    $qry1 = "SELECT * FROM meds WHERE med_id = '$id'";
+    $result = $conn->query($qry1);
+    $row = $result->fetch_row();
+}
 ?>
 
 <!DOCTYPE html>
@@ -24,6 +28,7 @@ Medicines
 </head>
 
 <body>
+    <?php render_flash_message(); ?>
 
 	<?php 
 require('../sidebar.php');
@@ -72,19 +77,23 @@ require('../sidebar.php');
 				
 	<?php
 
-		if( isset($_POST['medname'])||isset($_POST['qty'])||isset($_POST['cat'])||isset($_POST['sp'])||isset($_POST['loc'])) {
-			 $id=$_POST['medid'];
-			 $name=$_POST['medname'];
-			 $qty=$_POST['qty'];
-			 $cat=$_POST['cat'];
-			 $price=$_POST['sp'];
-			 $lcn=$_POST['loc'];
+		if (isset($_POST['update'])) {
+		    $id = $conn->real_escape_string($_POST['medid']);
+		    $name = $conn->real_escape_string($_POST['medname']);
+		    $qty = $conn->real_escape_string($_POST['qty']);
+		    $cat = $conn->real_escape_string($_POST['cat']);
+		    $price = $conn->real_escape_string($_POST['sp']);
+		    $lcn = $conn->real_escape_string($_POST['loc']);
 			 
-		$sql="UPDATE meds SET med_name='$name',med_qty='$qty',category='$cat',med_price='$price',location_rack='$lcn' where med_id='$id'";
-		if ($conn->query($sql))
-		header("location:view.php");
-		else
-		echo "<p style='font-size:8;color:red;'>Error! Unable to update.</p>";
+		    $sql = "UPDATE meds SET med_name='$name', med_qty='$qty', category='$cat', med_price='$price', location_rack='$lcn' WHERE med_id='$id'";
+		    
+		    if ($conn->query($sql)) {
+		        set_flash_message("Medicine details updated successfully.", "success");
+		        header("Location: view.php");
+		        exit();
+		    } else {
+		        set_flash_message("Unable to update medicine details.", "error");
+		    }
 		}
 
 	?>

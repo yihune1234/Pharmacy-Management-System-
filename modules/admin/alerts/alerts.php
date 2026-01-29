@@ -29,6 +29,12 @@ class AlertSystem {
     }
     
     private static function logAlert($alert) {
+        // Create logs directory if it doesn't exist
+        $log_dir = dirname(self::$persistent_log_file);
+        if (!file_exists($log_dir)) {
+            mkdir($log_dir, 0755, true);
+        }
+        
         $log_entry = json_encode($alert) . "\n";
         file_put_contents(self::$persistent_log_file, $log_entry, FILE_APPEND | LOCK_EX);
     }
@@ -101,25 +107,35 @@ class AlertSystem {
     public static function checkExpiryAlerts() {
         global $conn;
         
-        $expiry_alerts = $conn->query("
-            SELECT Med_ID, Med_Name, Exp_Date, Med_Qty
-            FROM meds
-            WHERE Exp_Date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
-            ORDER BY Exp_Date ASC
-        ");
-        
-        if ($expiry_alerts && $expiry_alerts->num_rows > 0) {
-            while($med = $expiry_alerts->fetch_assoc()) {
-                $days_to_expiry = (strtotime($med['Exp_Date']) - time()) / (60 * 60 * 24);
-                $severity = $days_to_expiry <= 0 ? 'critical' : ($days_to_expiry <= 7 ? 'error' : 'warning');
-                
-                self::addAlert($severity, 'Expiry Alert: ' . $med['Med_Name'], [
-                    'medicine_id' => $med['Med_ID'],
-                    'expiry_date' => $med['Exp_Date'],
-                    'days_to_expiry' => round($days_to_expiry),
-                    'quantity' => $med['Med_Qty']
-                ]);
+        try {
+            // Use purchase table for expiry dates since meds table doesn't have Exp_Date
+            $expiry_alerts = $conn->query("
+                SELECT DISTINCT p.Med_ID, m.Med_Name, p.Exp_Date, p.P_Qty as Med_Qty
+                FROM purchase p
+                JOIN meds m ON p.Med_ID = m.Med_ID
+                WHERE p.Exp_Date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+                AND p.Exp_Date >= CURDATE()
+                ORDER BY p.Exp_Date ASC
+            ");
+            
+            if ($expiry_alerts && $expiry_alerts->num_rows > 0) {
+                while($med = $expiry_alerts->fetch_assoc()) {
+                    $days_to_expiry = (strtotime($med['Exp_Date']) - time()) / (60 * 60 * 24);
+                    $severity = $days_to_expiry <= 0 ? 'critical' : ($days_to_expiry <= 7 ? 'error' : 'warning');
+                    
+                    self::addAlert($severity, 'Expiry Alert: ' . $med['Med_Name'], [
+                        'medicine_id' => $med['Med_ID'],
+                        'expiry_date' => $med['Exp_Date'],
+                        'days_to_expiry' => round($days_to_expiry),
+                        'quantity' => $med['Med_Qty']
+                    ]);
+                }
             }
+        } catch (Exception $e) {
+            self::addAlert('error', 'Unable to check expiry alerts: ' . $e->getMessage(), [
+                'error_type' => 'database_error',
+                'query' => 'expiry_alerts_check'
+            ]);
         }
     }
     

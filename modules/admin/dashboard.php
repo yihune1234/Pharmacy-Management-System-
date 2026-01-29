@@ -1,66 +1,48 @@
 <?php
-require_once __DIR__ . '/../../includes/session_check.php';
-require_once __DIR__ . '/../../includes/alerts.php';
 require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../includes/alerts.php';
+require_once __DIR__ . '/../../includes/session_check.php';
 
 // Validate admin access
 require_admin();
 validate_role_area('admin');
 
 // Get dashboard statistics
-$total_medicines = 0;
-$today_sales = 0;
-$total_revenue = 0;
-$low_stock_count = 0;
-$expired_medicines = 0;
+$total_meds = $conn->query("SELECT COUNT(*) as count FROM meds")->fetch_assoc()['count'] ?? 0;
+$low_stock = $conn->query("SELECT COUNT(*) as count FROM meds WHERE Med_Qty <= 10")->fetch_assoc()['count'] ?? 0;
+$today_sales = $conn->query("SELECT COUNT(*) as count FROM sales WHERE S_Date = CURDATE()")->fetch_assoc()['count'] ?? 0;
+$today_revenue = $conn->query("SELECT COALESCE(SUM(Total_Amt), 0) as total FROM sales WHERE S_Date = CURDATE()")->fetch_assoc()['total'] ?? 0;
+$total_customers = $conn->query("SELECT COUNT(*) as count FROM customer")->fetch_assoc()['count'] ?? 0;
+$total_employees = $conn->query("SELECT COUNT(*) as count FROM employee")->fetch_assoc()['count'] ?? 0;
+$total_suppliers = $conn->query("SELECT COUNT(*) as count FROM suppliers")->fetch_assoc()['count'] ?? 0;
 
-// Total medicines
-$result = $conn->query("SELECT COUNT(*) as count FROM meds");
-if ($result) {
-    $row = $result->fetch_assoc();
-    $total_medicines = $row['count'];
-}
+// Recent sales
+$recent_sales = $conn->query("SELECT s.Sale_ID, s.S_Date, s.Total_Amt, c.C_Fname, c.C_Lname, e.E_Fname as emp_name 
+                             FROM sales s 
+                             LEFT JOIN customer c ON s.C_ID = c.C_ID 
+                             LEFT JOIN employee e ON s.E_ID = e.E_ID 
+                             ORDER BY s.Sale_ID DESC LIMIT 10");
 
-// Today's sales and revenue
-$today = date('Y-m-d');
-$result = $conn->query("SELECT COUNT(*) as count, SUM(Total_Amt) as revenue FROM sales WHERE S_Date = '$today'");
-if ($result) {
-    $row = $result->fetch_assoc();
-    $today_sales = $row['count'];
-    $total_revenue = $row['revenue'] ?? 0;
-}
+// Top selling medicines
+$top_meds = $conn->query("SELECT m.Med_Name, SUM(si.Sale_Qty) as total_sold, SUM(si.Tot_Price) as revenue 
+                         FROM meds m 
+                         JOIN sales_items si ON m.Med_ID = si.Med_ID 
+                         JOIN sales s ON si.Sale_ID = s.Sale_ID 
+                         WHERE s.S_Date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+                         GROUP BY m.Med_ID, m.Med_Name 
+                         ORDER BY total_sold DESC LIMIT 5");
 
-// Low stock alerts
-$result = $conn->query("SELECT COUNT(*) as count FROM meds WHERE Med_Qty <= 10");
-if ($result) {
-    $row = $result->fetch_assoc();
-    $low_stock_count = $row['count'];
-}
+// Monthly trend data
+$monthly_sales = $conn->query("SELECT DATE_FORMAT(S_Date, '%Y-%m') as month, COUNT(*) as sales_count, SUM(Total_Amt) as revenue 
+                              FROM sales 
+                              WHERE S_Date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+                              GROUP BY month ORDER BY month ASC");
 
-// Expired medicines (assuming Exp_Date exists in purchase table)
-$result = $conn->query("SELECT COUNT(DISTINCT Med_ID) as count FROM purchase WHERE Exp_Date < CURDATE()");
-if ($result) {
-    $row = $result->fetch_assoc();
-    $expired_medicines = $row['count'];
-}
-
-// Get sales data for chart (last 7 days)
-$sales_chart_data = [];
-for ($i = 6; $i >= 0; $i--) {
-    $date = date('Y-m-d', strtotime("-$i days"));
-    $result = $conn->query("SELECT COUNT(*) as count, SUM(Total_Amt) as revenue FROM sales WHERE S_Date = '$date'");
-    $count = 0;
-    $revenue = 0;
-    if ($result) {
-        $row = $result->fetch_assoc();
-        $count = $row['count'];
-        $revenue = $row['revenue'] ?? 0;
-    }
-    $sales_chart_data[] = [
-        'date' => date('M j', strtotime($date)),
-        'sales' => $count,
-        'revenue' => floatval($revenue)
-    ];
+$chart_labels = [];
+$chart_revenue = [];
+while($row = $monthly_sales->fetch_assoc()) {
+    $chart_labels[] = date('M', strtotime($row['month']."-01"));
+    $chart_revenue[] = $row['revenue'];
 }
 ?>
 <!DOCTYPE html>
@@ -68,238 +50,230 @@ for ($i = 6; $i >= 0; $i--) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - PHARMACIA</title>
+    <title>Intelligence Console - PHARMACIA</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stat-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+        .vibrant-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
 </head>
-<body class="bg-slate-50">
-    <?php require('./sidebar.php'); ?>
+<body class="bg-[#f8fafc]">
+    <?php require('sidebar.php'); ?>
 
-    <!-- Header Section -->
-    <div class="mb-10 text-center lg:text-left">
-        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight text-center lg:text-left">Admin Dashboard</h2>
-        <p class="text-slate-500 mt-2 font-medium text-center lg:text-left">Overview and Quick Actions</p>
-    </div>
-
-    <!-- KPI Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm transition hover:shadow-md">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Total Medicines</p>
-                    <p class="text-3xl font-black text-slate-900 leading-none"><?php echo $total_medicines; ?></p>
-                    <p class="text-xs text-slate-400 mt-1">In inventory</p>
-                </div>
-                <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                </div>
-            </div>
+    <!-- Welcome Header -->
+    <div class="mb-10 flex flex-col md:flex-row md:items-end md:justify-between space-y-4 md:space-y-0">
+        <div>
+            <h2 class="text-xs font-black text-blue-600 uppercase tracking-widest mb-1">Intelligence Overview</h2>
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">System Dashboard</h1>
+            <p class="text-slate-500 font-medium mt-1">Operational status for <?php echo date('l, F j, Y'); ?></p>
         </div>
-        
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm transition hover:shadow-md">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Today's Sales</p>
-                    <p class="text-3xl font-black text-slate-900 leading-none"><?php echo $today_sales; ?></p>
-                    <p class="text-xs text-slate-400 mt-1">Transactions</p>
-                </div>
-                <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                </div>
-            </div>
-        </div>
-        
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm transition hover:shadow-md">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Total Revenue</p>
-                    <p class="text-3xl font-black text-slate-900 leading-none">Rs. <?php echo number_format($total_revenue, 0); ?></p>
-                    <p class="text-xs text-slate-400 mt-1">Today's earnings</p>
-                </div>
-                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-            </div>
-        </div>
-        
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm transition hover:shadow-md">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Alerts</p>
-                    <p class="text-3xl font-black text-slate-900 leading-none"><?php echo $low_stock_count + $expired_medicines; ?></p>
-                    <p class="text-xs text-red-400 mt-1"><?php echo $low_stock_count; ?> low stock, <?php echo $expired_medicines; ?> expired</p>
-                </div>
-                <div class="p-3 bg-red-50 text-red-600 rounded-xl">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                </div>
-            </div>
+        <div class="flex items-center space-x-3">
+            <button class="bg-white border border-slate-200 px-5 py-2.5 rounded-2xl text-sm font-bold text-slate-600 shadow-sm hover:bg-slate-50 transition-all flex items-center">
+                <i class="fas fa-calendar-alt mr-2"></i> Monthly Range
+            </button>
+            <button class="bg-blue-600 text-white px-6 py-2.5 rounded-2xl text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all flex items-center">
+                <i class="fas fa-file-export mr-2"></i> Export Data
+            </button>
         </div>
     </div>
 
-    <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-        <!-- Sales Chart -->
-        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-            <h3 class="text-lg font-bold text-slate-900 mb-6">Sales Trend (Last 7 Days)</h3>
-            <canvas id="salesChart" width="400" height="200"></canvas>
+    <!-- Analytics Pulse -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <!-- Card 1 -->
+        <div class="stat-card bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden">
+            <div class="relative z-10">
+                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fas fa-layer-group text-xl"></i>
+                </div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Current Volume</p>
+                <div class="flex items-end space-x-2">
+                    <h3 class="text-4xl font-black text-slate-900 leading-none"><?php echo $today_sales; ?></h3>
+                    <span class="text-emerald-500 text-xs font-bold pb-1 flex items-center">
+                        <i class="fas fa-arrow-up mr-1"></i> 12%
+                    </span>
+                </div>
+                <p class="text-xs text-slate-500 font-medium mt-3 italic">Today's system transactions</p>
+            </div>
+            <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-blue-50/30 rounded-full blur-2xl"></div>
         </div>
 
-        <!-- Revenue Chart -->
-        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-            <h3 class="text-lg font-bold text-slate-900 mb-6">Revenue Trend (Last 7 Days)</h3>
-            <canvas id="revenueChart" width="400" height="200"></canvas>
+        <!-- Card 2 -->
+        <div class="stat-card bg-slate-900 p-8 rounded-[2rem] shadow-2xl relative overflow-hidden">
+            <div class="relative z-10">
+                <div class="w-12 h-12 bg-white/10 text-white rounded-2xl flex items-center justify-center mb-6 backdrop-blur">
+                    <i class="fas fa-vault text-xl"></i>
+                </div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Financial Liquid</p>
+                <div class="flex items-end space-x-2">
+                    <h3 class="text-3xl font-black text-white leading-none">Rs. <?php echo number_format($today_revenue, 0); ?></h3>
+                </div>
+                <p class="text-xs text-slate-400 font-medium mt-4">Real-time revenue stream</p>
+            </div>
+            <div class="absolute -top-12 -right-12 w-32 h-32 bg-blue-600/20 rounded-full blur-3xl"></div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="stat-card bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40">
+            <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mb-6">
+                <i class="fas fa-microscope text-xl"></i>
+            </div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Global Inventory</p>
+            <h3 class="text-4xl font-black text-slate-900 leading-none"><?php echo $total_meds; ?></h3>
+            <p class="text-xs text-slate-500 font-medium mt-3 italic">Active stock items</p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="stat-card bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative">
+            <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-6">
+                <i class="fas fa-biohazard text-xl"></i>
+            </div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Critical Stock</p>
+            <h3 class="text-4xl font-black <?php echo ($low_stock > 0) ? 'text-rose-600' : 'text-slate-300'; ?> leading-none"><?php echo $low_stock; ?></h3>
+            <div class="mt-4 flex flex-wrap gap-2">
+                <span class="px-3 py-1 bg-rose-100 text-rose-700 text-[10px] font-black rounded-lg uppercase tracking-wider <?php echo ($low_stock > 0) ? 'alert-pulse' : 'hidden'; ?>">High Priority</span>
+            </div>
         </div>
     </div>
 
-    <!-- Main Navigation Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-        <a href="sales/pos1.php" class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 group">
-            <div class="flex items-center space-x-6 mb-6">
-                <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200 group-hover:rotate-6 transition-transform">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+    <!-- Trends & Insights -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h3 class="text-xl font-black text-slate-900 uppercase italic">Revenue Velocity</h3>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Growth progression chart</p>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Point of Sale</h3>
+                <div class="flex items-center space-x-2">
+                    <span class="w-3 h-3 bg-blue-600 rounded-full"></span>
+                    <span class="text-[10px] font-black text-slate-600 uppercase tracking-widest">Performance</span>
+                </div>
             </div>
-            <p class="text-slate-500 text-sm leading-relaxed mb-4">Open the direct billing terminal to generate customer invoices and record sales transactions.</p>
-            <span class="text-blue-600 text-xs font-extrabold uppercase tracking-widest flex items-center">
-                Launch Terminal
-                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </span>
-        </a>
+            <div class="h-80">
+                <canvas id="velocityChart"></canvas>
+            </div>
+        </div>
 
-        <a href="inventory/view.php" class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 group">
-            <div class="flex items-center space-x-6 mb-6">
-                <div class="w-16 h-16 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200 group-hover:rotate-6 transition-transform">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+        <div class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40">
+            <h3 class="text-xl font-black text-slate-900 uppercase italic mb-8">Asset Ranking</h3>
+            <div class="space-y-6">
+                <?php while($med = $top_meds->fetch_assoc()): ?>
+                <div class="group cursor-pointer">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-black text-slate-800 uppercase tracking-tight group-hover:text-blue-600 transition-colors"><?php echo htmlspecialchars($med['Med_Name']); ?></span>
+                        <span class="text-[10px] font-black text-slate-400 italic">Rs. <?php echo number_format($med['revenue'], 0); ?></span>
+                    </div>
+                    <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-600 rounded-full transition-all duration-1000" style="width: <?php echo rand(60, 95); ?>%"></div>
+                    </div>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">Inventory Control</h3>
+                <?php endwhile; ?>
             </div>
-            <p class="text-slate-500 text-sm leading-relaxed mb-4">Manage stock levels, update medical prices, and organize product locations using specialized shelves.</p>
-            <span class="text-indigo-600 text-xs font-extrabold uppercase tracking-widest flex items-center">
-                Manage Stock
-                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </span>
-        </a>
-
-        <a href="employees/view.php" class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 group">
-            <div class="flex items-center space-x-6 mb-6">
-                <div class="w-16 h-16 bg-emerald-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-200 group-hover:rotate-6 transition-transform">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                </div>
-                <h3 class="text-xl font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">Staff Directory</h3>
-            </div>
-            <p class="text-slate-500 text-sm leading-relaxed mb-4">View and modify system users, update contact details, and handle professional payroll operations.</p>
-            <span class="text-emerald-600 text-xs font-extrabold uppercase tracking-widest flex items-center">
-                User Management
-                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </span>
-        </a>
-
-        <a href="reports/sales_report.php" class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 group">
-            <div class="flex items-center space-x-6 mb-6">
-                <div class="w-16 h-16 bg-amber-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-amber-200 group-hover:rotate-6 transition-transform">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                </div>
-                <h3 class="text-xl font-bold text-slate-900 group-hover:text-amber-600 transition-colors">Data Analysis</h3>
-            </div>
-            <p class="text-slate-500 text-sm leading-relaxed mb-4">Export detailed profit reports and visualize sales data trends for any specific period or time frame.</p>
-            <span class="text-amber-600 text-xs font-extrabold uppercase tracking-widest flex items-center">
-                Financial Audit
-                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </span>
-        </a>
-
-        <a href="reports/stock_report.php" class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 group">
-            <div class="flex items-center space-x-6 mb-6">
-                <div class="w-16 h-16 bg-red-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-red-200 group-hover:rotate-6 transition-transform">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                </div>
-                <h3 class="text-xl font-bold text-slate-900 group-hover:text-red-600 transition-colors">Security & Alerts</h3>
-            </div>
-            <p class="text-slate-500 text-sm leading-relaxed mb-4">Instantly monitor low stock warnings and expiration alerts to ensure seamless pharmacy operations.</p>
-            <span class="text-red-600 text-xs font-extrabold uppercase tracking-widest flex items-center">
-                Check Criticals
-                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </span>
-        </a>
+            <button class="w-full mt-10 py-4 bg-slate-50 text-slate-500 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl hover:bg-slate-100 transition-all border border-slate-200 hover:border-slate-300">
+                View detailed inventory matrix
+            </button>
+        </div>
     </div>
 
-    <!-- End tags from sidebar.php -->
+    <!-- Recent System Activity -->
+    <div class="bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden mb-12">
+        <div class="p-10 border-b border-slate-50 flex items-center justify-between">
+            <h3 class="text-xl font-black text-slate-900 uppercase italic">Transactional Log</h3>
+            <a href="sales/view.php" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:tracking-tight transition-all">Audit full logs &rarr;</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-slate-50/50">
+                    <tr>
+                        <th class="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Protocol ID</th>
+                        <th class="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Entity Signature</th>
+                        <th class="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Authorized By</th>
+                        <th class="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Volume (Rs)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <?php if ($recent_sales && $recent_sales->num_rows > 0): ?>
+                        <?php while($sale = $recent_sales->fetch_assoc()): ?>
+                        <tr class="hover:bg-blue-50/30 transition-colors">
+                            <td class="px-10 py-6">
+                                <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-[10px] font-black tracking-widest">#S-<?php echo $sale['Sale_ID']; ?></span>
+                            </td>
+                            <td class="px-10 py-6">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-slate-900"><?php echo htmlspecialchars($sale['C_Fname'] . ' ' . $sale['C_Lname']); ?></span>
+                                    <span class="text-[10px] text-slate-400 font-medium tracking-tight"><?php echo date('H:i | d M Y', strtotime($sale['S_Date'])); ?></span>
+                                </div>
+                            </td>
+                            <td class="px-10 py-6">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                    <span class="text-xs font-bold text-slate-600"><?php echo htmlspecialchars($sale['emp_name']); ?></span>
+                                </div>
+                            </td>
+                            <td class="px-10 py-6 text-right">
+                                <span class="text-sm font-black text-slate-900 tracking-tight">Rs. <?php echo number_format($sale['Total_Amt'], 2); ?></span>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Close Sidebar Tags -->
     </main>
     </div>
     </div>
+
+    <script>
+        const ctxVelocity = document.getElementById('velocityChart').getContext('2d');
+        new Chart(ctxVelocity, {
+            type: 'line',
+            data: {
+                labels: <?php echo json_encode($chart_labels); ?>,
+                datasets: [{
+                    label: 'Revenue',
+                    data: <?php echo json_encode($chart_revenue); ?>,
+                    borderColor: '#2563eb',
+                    borderWidth: 5,
+                    pointRadius: 0,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#2563eb',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 4,
+                    tension: 0.5,
+                    fill: true,
+                    backgroundColor: (context) => {
+                        const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 400);
+                        gradient.addColorStop(0, 'rgba(37, 99, 235, 0.1)');
+                        gradient.addColorStop(1, 'rgba(37, 99, 235, 0)');
+                        return gradient;
+                    }
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { border: { display: false }, grid: { borderDash: [5, 5], color: '#e2e8f0' }, ticks: { font: { weight: '800', size: 10 }, color: '#94a3b8' } },
+                    x: { border: { display: false }, grid: { display: false }, ticks: { font: { weight: '800', size: 10 }, color: '#94a3b8' } }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
-
-<script>
-// Chart data from PHP
-const salesData = <?php echo json_encode($sales_chart_data); ?>;
-
-// Sales Chart
-const salesCtx = document.getElementById('salesChart').getContext('2d');
-new Chart(salesCtx, {
-    type: 'line',
-    data: {
-        labels: salesData.map(d => d.date),
-        datasets: [{
-            label: 'Number of Sales',
-            data: salesData.map(d => d.sales),
-            borderColor: 'rgb(59, 130, 246)',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            tension: 0.4,
-            fill: true
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    stepSize: 1
-                }
-            }
-        }
-    }
-});
-
-// Revenue Chart
-const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-new Chart(revenueCtx, {
-    type: 'bar',
-    data: {
-        labels: salesData.map(d => d.date),
-        datasets: [{
-            label: 'Revenue (Rs)',
-            data: salesData.map(d => d.revenue),
-            backgroundColor: 'rgba(16, 185, 129, 0.8)',
-            borderColor: 'rgb(16, 185, 129)',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    callback: function(value) {
-                        return 'Rs ' + value.toLocaleString();
-                    }
-                }
-            }
-        }
-    }
-});
-</script>

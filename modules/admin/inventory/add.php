@@ -1,6 +1,11 @@
 <?php
 require_once __DIR__ . '/../../../config/config.php';
 require_once __DIR__ . '/../../../includes/alerts.php';
+require_once __DIR__ . '/../../../includes/session_check.php';
+
+// Validate admin access
+require_admin();
+validate_role_area('admin');
 
 if (isset($_POST['add'])) {
     $name     = $conn->real_escape_string($_POST['medname']);
@@ -12,153 +17,141 @@ if (isset($_POST['add'])) {
     $min_stock = (int)($_POST['min_stock'] ?? 10);
 
     if (empty($name) || empty($category)) {
-        set_flash_message("Please fill in all required fields.", "error");
+        set_flash_message("Operational failure: Required fields missing.", "error");
     } else {
-        // Check if barcode already exists (if provided)
-        if (!empty($barcode)) {
-            $check_sql = "SELECT Med_ID FROM meds WHERE Barcode = '$barcode'";
-            $check_result = $conn->query($check_sql);
-            if ($check_result && $check_result->num_rows > 0) {
-                set_flash_message("Barcode already exists in the system.", "error");
-            } else {
-                $sql = "INSERT INTO meds (Med_Name, Med_Qty, Category, Med_Price, Location_Rack, Barcode, Min_Stock_Level) 
-                        VALUES ('$name', $qty, '$category', $sprice, '$location', '$barcode', $min_stock)";
-                
-                if ($conn->query($sql)) {
-                    set_flash_message("Medicine '$name' added successfully!", "success");
-                    header("Location: view.php");
-                    exit();
-                } else {
-                    set_flash_message("Something went wrong. Please check your data and try again.", "error");
-                }
-            }
+        $barcode_clause = !empty($barcode) ? "'$barcode'" : "NULL";
+        $sql = "INSERT INTO meds (Med_Name, Med_Qty, Category, Med_Price, Location_Rack, Barcode, Min_Stock_Level) 
+                VALUES ('$name', $qty, '$category', $sprice, '$location', $barcode_clause, $min_stock)";
+        
+        if ($conn->query($sql)) {
+            set_flash_message("Asset '$name' successfully integrated into synchronization.", "success");
+            header("Location: view.php");
+            exit();
         } else {
-            $sql = "INSERT INTO meds (Med_Name, Med_Qty, Category, Med_Price, Location_Rack, Barcode, Min_Stock_Level) 
-                    VALUES ('$name', $qty, '$category', $sprice, '$location', NULL, $min_stock)";
-            
-            if ($conn->query($sql)) {
-                set_flash_message("Medicine '$name' added successfully!", "success");
-                header("Location: view.php");
-                exit();
-            } else {
-                set_flash_message("Something went wrong. Please check your data and try again.", "error");
-            }
+            set_flash_message("Integration protocol failed. Verify data integrity.", "error");
         }
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Medicine - PHARMACIA</title>
+    <title>Asset Registration - PHARMACIA</title>
 </head>
-<body class="bg-slate-50">
+<body class="bg-[#f8fafc]">
     <?php require('../sidebar.php'); ?>
 
-    <!-- Page Header -->
-    <div class="mb-10 flex items-center justify-between">
+    <!-- Header -->
+    <div class="mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
         <div>
-            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Register Product</h2>
-            <p class="text-slate-500 mt-1 font-medium">Add a new pharmaceutical item to your inventory.</p>
+            <h2 class="text-xs font-black text-blue-600 uppercase tracking-widest mb-1">Asset Integration</h2>
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Register Medicine</h1>
+            <p class="text-slate-500 font-medium mt-1">Append new pharmaceutical assets to the global inventory matrix.</p>
         </div>
-        <a href="view.php" class="bg-white text-slate-600 px-6 py-3 rounded-2xl font-bold text-sm border border-slate-200 hover:bg-slate-50 transition-all flex items-center shadow-sm">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            Back to List
+        <a href="view.php" class="bg-white border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold text-slate-600 shadow-sm hover:bg-slate-50 transition-all flex items-center">
+            <i class="fas fa-arrow-left-long mr-2"></i> Return to Matrix
         </a>
     </div>
 
-    <!-- Form Card -->
-    <div class="max-w-5xl">
-        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" class="space-y-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
-                <!-- Left Details -->
-                <div class="lg:col-span-2 space-y-6">
-                    <div class="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/40">
-                        <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center">
-                            <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mr-3 text-sm">01</span>
-                            Primary Information
-                        </h3>
+    <!-- Main Registration Console -->
+    <div class="max-w-6xl">
+        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            <!-- Data Entry Block -->
+            <div class="lg:col-span-2 space-y-8">
+                <div class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/40 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                    
+                    <h3 class="text-xl font-black text-slate-900 uppercase italic mb-10 flex items-center">
+                        <span class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center mr-4 text-xs font-black shadow-lg shadow-blue-200">01</span>
+                        Asset Signature
+                    </h3>
+                    
+                    <div class="space-y-8">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Official Asset Name</label>
+                            <input type="text" name="medname" placeholder="Enter pharmaceutical designation..." required
+                                class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all outline-none font-bold text-slate-700 placeholder:text-slate-300">
+                        </div>
                         
-                        <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
-                                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Medicine Name <span class="text-rose-500">*</span></label>
-                                <input type="text" name="medname" placeholder="e.g. Paracetamol 500mg" required
-                                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-semibold text-slate-700">
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Barcode (Optional)</label>
-                                    <input type="text" name="barcode" placeholder="e.g. 1234567890123" maxlength="50"
-                                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-semibold text-slate-700">
-                                    <p class="text-xs text-slate-400 mt-1">Unique barcode for scanning</p>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Min Stock Level</label>
-                                    <input type="number" name="min_stock" value="10" min="1" max="1000"
-                                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-semibold text-slate-700">
-                                    <p class="text-xs text-slate-400 mt-1">Alert when stock falls below this</p>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Global Barcode</label>
+                                <div class="relative">
+                                    <i class="fas fa-barcode absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                                    <input type="text" name="barcode" placeholder="UPC/EAN Format..."
+                                        class="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-6 py-5 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all outline-none font-bold text-slate-700 placeholder:text-slate-300">
                                 </div>
                             </div>
                             
                             <div>
-                                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Stock Category <span class="text-rose-500">*</span></label>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Critical Threshold</label>
+                                <div class="relative">
+                                    <i class="fas fa-bell absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                                    <input type="number" name="min_stock" value="10"
+                                        class="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-6 py-5 focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 focus:bg-white transition-all outline-none font-bold text-slate-700">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Classification</label>
                                 <select name="cat" required
-                                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-semibold text-slate-700 appearance-none">
+                                    class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all outline-none font-bold text-slate-700 appearance-none">
                                     <option value="">Select Category</option>
                                     <option>Tablet</option>
-                                        <option>Capsule</option>
-                                        <option>Syrup</option>
-                                        <option>Injection</option>
-                                        <option>Ointment</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Initial Quantity</label>
-                                    <input type="number" name="qty" placeholder="0" value="0"
-                                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-semibold text-slate-700">
-                                </div>
+                                    <option>Capsule</option>
+                                    <option>Syrup</option>
+                                    <option>Injection</option>
+                                    <option>Ointment</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Initial Stockpile</label>
+                                <input type="number" name="qty" placeholder="0" value="0"
+                                    class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all outline-none font-bold text-slate-700">
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Right Details -->
-                <div class="space-y-6">
-                    <div class="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/40 h-full">
-                        <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center">
-                            <span class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center mr-3 text-sm">02</span>
-                            Pricing & Storage
-                        </h3>
-                        
-                        <div class="space-y-6">
-                            <div>
-                                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Unit Price (Rs)</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 flex items-center pl-5 text-slate-400 font-bold">Rs.</span>
-                                    <input type="number" step="0.01" name="sp" placeholder="0.00" required
-                                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-5 py-4 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none font-black text-slate-700">
-                                </div>
+            <!-- Configuration Block -->
+            <div class="space-y-8">
+                <div class="bg-slate-900 p-10 rounded-[3rem] shadow-2xl relative overflow-hidden h-full">
+                    <div class="absolute bottom-0 right-0 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl -mb-24 -mr-24"></div>
+                    
+                    <h3 class="text-xl font-black text-white uppercase italic mb-10 flex items-center">
+                        <span class="w-10 h-10 bg-white/10 text-white rounded-xl flex items-center justify-center mr-4 text-xs font-black backdrop-blur">02</span>
+                        Valuation
+                    </h3>
+                    
+                    <div class="space-y-8">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Target Price (Rs)</label>
+                            <div class="relative">
+                                <span class="absolute left-6 top-1/2 -translate-y-1/2 text-blue-500 font-extrabold">Rs.</span>
+                                <input type="number" step="0.01" name="sp" placeholder="0.00" required
+                                    class="w-full bg-white/5 border border-white/10 rounded-2xl pl-14 pr-6 py-5 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white/10 transition-all outline-none font-black text-white placeholder:text-slate-600 text-2xl">
                             </div>
-                            
-                            <div>
-                                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Storage Location</label>
-                                <input type="text" name="loc" placeholder="Shelf A-1"
-                                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-semibold text-slate-700">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Logical Storage</label>
+                            <div class="relative">
+                                <i class="fas fa-location-arrow absolute left-5 top-1/2 -translate-y-1/2 text-slate-600"></i>
+                                <input type="text" name="loc" placeholder="Shelf e.g. B-09"
+                                    class="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-6 py-5 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white/10 transition-all outline-none font-bold text-white placeholder:text-slate-600">
                             </div>
                         </div>
 
-                        <div class="mt-12">
-                            <button type="submit" name="add" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-500/30 transition-all active:scale-95 flex items-center justify-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                Save Medicine
+                        <div class="pt-10">
+                            <button type="submit" name="add" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-6 rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-95 flex items-center justify-center text-lg">
+                                <i class="fas fa-microchip mr-3"></i> Execute Protocol
                             </button>
-                            <p class="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-4">Medicine ID will be auto-generated</p>
+                            <p class="text-center text-[9px] text-slate-500 font-black uppercase tracking-[0.3em] mt-6">Secure Transaction Encrypted</p>
                         </div>
                     </div>
                 </div>
@@ -170,8 +163,5 @@ if (isset($_POST['add'])) {
     </main>
     </div>
     </div>
-
-    <?php $conn->close(); ?>
 </body>
 </html>
-
