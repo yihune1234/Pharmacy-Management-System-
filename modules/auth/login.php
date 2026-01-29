@@ -16,10 +16,10 @@ if (isset($_POST['submit'])) {
     } else {
 
         $stmt = $conn->prepare("
-            SELECT e.E_ID, e.E_Fname, e.E_Username as username, e.E_Password as password, r.role_name
+            SELECT e.E_ID, e.E_Fname, e.username, e.password, r.role_name
             FROM employee e
             LEFT JOIN roles r ON e.role_id = r.role_id
-            WHERE e.E_Username = ?
+            WHERE e.username = ?
             LIMIT 1
         ");
 
@@ -93,11 +93,13 @@ if (isset($_POST['submit'])) {
         }
     </style>
 </head>
-<body class="bg-[#f0f4f8] min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+<body class="bg-[#f0f4f8] min-h-screen flex items-center justify-center p-6 relative overflow-y-auto overflow-x-hidden">
     
     <!-- Background Accents -->
-    <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-400/10 rounded-full blur-[120px] animate-pulse"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-400/10 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-400/10 rounded-full blur-[120px] animate-pulse"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-400/10 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
 
     <div class="w-full max-w-[480px] relative z-10 transition-all duration-500">
         <!-- Logo Section -->
