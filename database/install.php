@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS employee (
     E_ID INT AUTO_INCREMENT PRIMARY KEY,
     E_Fname VARCHAR(50) NOT NULL,
     E_Lname VARCHAR(50) NOT NULL,
-    Bdate DATE,
+    E_Bdate DATE,
     E_Age INT,
     E_Sex ENUM('M','F'),
     E_Type VARCHAR(30),
@@ -48,12 +48,15 @@ CREATE TABLE IF NOT EXISTS employee (
     E_Mail VARCHAR(100),
     E_Phno VARCHAR(20),
     E_Sal DECIMAL(10,2),
-    username VARCHAR(50) UNIQUE,
-    password VARCHAR(255),
+    E_Username VARCHAR(50) UNIQUE,
+    E_Password VARCHAR(255),
     role_id INT,
+    Password_Changed BOOLEAN DEFAULT 0,
+    Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Updated_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE SET NULL
 )");
- 
+
 /* =============================
    CREATE OTHER TABLES
 ============================= */
@@ -283,7 +286,7 @@ INSERT IGNORE INTO roles (role_id, role_name) VALUES
 ============================= */
 $defaultPassword = password_hash("admin123", PASSWORD_DEFAULT);
 $conn->query("
-INSERT IGNORE INTO employee (E_Fname, E_Lname, username, password, role_id)
+INSERT IGNORE INTO employee (E_Fname, E_Lname, E_Username, E_Password, role_id)
 VALUES ('System','Admin','admin','$defaultPassword',1)
 ");
 

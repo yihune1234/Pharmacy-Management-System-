@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../../config/config.php';
+require_once __DIR__ . '/../config/config.php';
 
 // Enable error reporting for debugging
 error_reporting(E_ALL);
@@ -60,8 +60,8 @@ foreach ($employees as $emp) {
     $role_id = $emp[2] === 'Pharmacist' ? 2 : ($emp[2] === 'Manager' ? 3 : ($emp[2] === 'Cashier' ? 4 : 5));
     $hashed_password = password_hash($emp[10], PASSWORD_DEFAULT);
     
-    $conn->query("INSERT INTO employee (E_Fname, E_Lname, E_Type, E_Sal, E_Sex, E_Bdate, E_Phno, E_Mail, E_Add, E_Username, E_Password, E_Jdate) 
-                  VALUES ('{$emp[0]}', '{$emp[1]}', '{$emp[2]}', {$emp[3]}, '{$emp[4]}', '{$emp[5]}', '{$emp[6]}', '{$emp[7]}', '{$emp[8]}', '{$emp[9]}', '$hashed_password', CURDATE())");
+    $conn->query("INSERT INTO employee (E_Fname, E_Lname, E_Type, E_Sal, E_Sex, E_Bdate, E_Phno, E_Mail, E_Add, E_Username, E_Password, E_Jdate, Password_Changed) 
+                  VALUES ('{$emp[0]}', '{$emp[1]}', '{$emp[2]}', {$emp[3]}, '{$emp[4]}', '{$emp[5]}', '{$emp[6]}', '{$emp[7]}', '{$emp[8]}', '{$emp[9]}', '$hashed_password', CURDATE(), 0)");
     
     $emp_id = $conn->insert_id;
     $conn->query("UPDATE employee SET role_id = $role_id WHERE E_ID = $emp_id");

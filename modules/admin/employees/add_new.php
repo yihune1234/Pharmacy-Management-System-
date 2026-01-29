@@ -17,43 +17,53 @@ if (isset($_POST['add_employee'])) {
     $position = $conn->real_escape_string($_POST['position']);
     $salary = (float)$_POST['salary'];
     $role = $conn->real_escape_string($_POST['role']);
-    $username = $conn->real_escape_string($_POST['username']);
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $dob = $_POST['dob'] ?? null;
     $gender = $_POST['gender'] ?? 'M';
 
-    if (!empty($fname) && !empty($lname) && !empty($username) && !empty($password)) {
-        // Check if username already exists
+    if (!empty($fname) && !empty($lname)) {
+        // Auto-generate username and password
+        $username = strtolower($fname) . strtolower($lname);
+        $default_password = strtolower($fname) . '123';
+        $hashed_password = password_hash($default_password, PASSWORD_DEFAULT);
+        
+        // Check if username already exists, add number if needed
         $check_sql = "SELECT E_ID FROM employee WHERE E_Username = '$username'";
         $check_result = $conn->query($check_sql);
         
         if ($check_result && $check_result->num_rows > 0) {
-            set_flash_message("Username already exists.", "error");
-        } else {
-            $sql = "INSERT INTO employee (E_Fname, E_Lname, E_Email, E_Phno, E_Add, E_Type, E_Sal, E_Username, E_Password, E_Bdate, E_Sex, E_Jdate) 
-                    VALUES ('$fname', '$lname', '$email', '$phone', '$address', '$position', $salary, '$username', '$password', '$dob', '$gender', CURDATE())";
+            $counter = 1;
+            do {
+                $new_username = $username . $counter;
+                $check_sql = "SELECT E_ID FROM employee WHERE E_Username = '$new_username'";
+                $check_result = $conn->query($check_sql);
+                $counter++;
+            } while ($check_result && $check_result->num_rows > 0);
+            $username = $new_username;
+        }
+        
+        $sql = "INSERT INTO employee (E_Fname, E_Lname, E_Email, E_Phno, E_Add, E_Type, E_Sal, E_Username, E_Password, E_Bdate, E_Sex, E_Jdate) 
+                VALUES ('$fname', '$lname', '$email', '$phone', '$address', '$position', $salary, '$username', '$hashed_password', '$dob', '$gender', CURDATE())";
+        
+        if ($conn->query($sql)) {
+            $employee_id = $conn->insert_id;
             
-            if ($conn->query($sql)) {
-                $employee_id = $conn->insert_id;
-                
-                // Insert into roles table
-                $role_sql = "INSERT INTO roles (role_name, description) VALUES ('$role', 'Employee role for $position')";
-                $conn->query($role_sql);
-                $role_id = $conn->insert_id;
-                
-                // Update employee with role_id
-                $update_sql = "UPDATE employee SET role_id = $role_id WHERE E_ID = $employee_id";
-                $conn->query($update_sql);
-                
-                // Log activity
-                log_activity($_SESSION['user'], 'ADD_EMPLOYEE', "Added new employee: $fname $lname");
-                
-                set_flash_message("Employee '$fname $lname' added successfully!", "success");
-                header("Location: view_new.php");
-                exit();
-            } else {
-                set_flash_message("Error adding employee. Please try again.", "error");
-            }
+            // Insert into roles table
+            $role_sql = "INSERT INTO roles (role_name, description) VALUES ('$role', 'Employee role for $position')";
+            $conn->query($role_sql);
+            $role_id = $conn->insert_id;
+            
+            // Update employee with role_id
+            $update_sql = "UPDATE employee SET role_id = $role_id WHERE E_ID = $employee_id";
+            $conn->query($update_sql);
+            
+            // Log activity
+            log_activity($_SESSION['user'], 'ADD_EMPLOYEE', "Added new employee: $fname $lname with username: $username and password: $default_password");
+            
+            set_flash_message("Employee '$fname $lname' added successfully!<br><strong>Username:</strong> $username<br><strong>Password:</strong> $default_password", "success");
+            header("Location: view_new.php");
+            exit();
+        } else {
+            set_flash_message("Error adding employee. Please try again.", "error");
         }
     } else {
         set_flash_message("Please fill in all required fields.", "error");
@@ -193,30 +203,31 @@ $roles = $conn->query("SELECT role_id, role_name FROM roles ORDER BY role_name")
             </div>
 
             <!-- Login Credentials -->
-            <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-8 rounded-3xl border border-purple-200">
-                <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center">
-                    <svg class="w-6 h-6 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-100">
+                <h3 class="text-lg font-bold text-blue-900 mb-3 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                     </svg>
-                    Login Credentials
+                    Login Credentials (Auto-Generated)
                 </h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Username <span class="text-rose-500">*</span></label>
-                        <input type="text" name="username" required
-                               placeholder="johndoe" 
-                               class="w-full bg-white border border-purple-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 transition-all outline-none font-semibold text-slate-700">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-blue-200">
+                        <p class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Username</p>
+                        <p class="text-sm text-slate-700 font-medium">firstname + lastname (lowercase)</p>
+                        <p class="text-xs text-slate-500 mt-1">Example: johnsmith</p>
                     </div>
-                    
-                    <div>
-                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Password <span class="text-rose-500">*</span></label>
-                        <input type="password" name="password" required
-                               placeholder="••••••••••" 
-                               class="w-full bg-white border border-purple-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 transition-all outline-none font-semibold text-slate-700">
-                        <p class="text-xs text-slate-400 mt-1">Password will be securely hashed</p>
+                    <div class="bg-white p-4 rounded-xl border border-blue-200">
+                        <p class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Password</p>
+                        <p class="text-sm text-slate-700 font-medium">firstname + 123</p>
+                        <p class="text-xs text-slate-500 mt-1">Example: john123</p>
                     </div>
                 </div>
+                <p class="text-xs text-blue-700 mt-3 flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Credentials will be displayed after successful employee creation
+                </p>
             </div>
 
             <!-- Submit Button -->

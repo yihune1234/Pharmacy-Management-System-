@@ -87,15 +87,24 @@ validate_role_area('admin');
         </nav>
 
         <div class="absolute bottom-0 left-0 w-full p-6 border-t border-slate-800 bg-slate-950">
-            <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-white">AD</div>
-                <div class="flex-grow overflow-hidden">
-                    <p class="text-xs font-bold text-white truncate">Administrator</p>
-                    <p class="text-[10px] text-slate-500">System Controller</p>
+            <div class="px-4 py-3 border-b border-slate-100">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
+                        <?php echo strtoupper(substr($_SESSION['name'], 0, 1)); ?>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-sm font-medium text-slate-900"><?php echo htmlspecialchars($_SESSION['name']); ?></div>
+                        <div class="text-xs text-slate-500"><?php echo htmlspecialchars($_SESSION['role']); ?></div>
+                    </div>
                 </div>
-                <a href="<?php echo $path; ?>../auth/logout.php" class="text-slate-500 hover:text-rose-500 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                </a>
+                <div class="mt-3 space-y-1">
+                    <a href="employees/change_password.php" class="block text-xs text-blue-600 hover:text-blue-800 font-medium">
+                        🔐 Change Password
+                    </a>
+                    <a href="../auth/logout.php" class="block text-xs text-red-600 hover:text-red-800 font-medium">
+                        🚪 Logout
+                    </a>
+                </div>
             </div>
         </div>
     </div>
