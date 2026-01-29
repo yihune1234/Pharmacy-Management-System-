@@ -31,13 +31,14 @@ if (isset($_POST['submit'])) {
             if ($result && $result->num_rows === 1) {
                 $row = $result->fetch_assoc();
 
-                // Plain password check (upgrade later to password_verify)
-                if ($password === $row['password']) {
+                // Use password_verify for hashed passwords
+                if (password_verify($password, $row['password'])) {
 
                     $_SESSION['user'] = $row['E_ID'];
                     $_SESSION['username'] = $row['username'];
                     $_SESSION['name'] = $row['E_Fname'];
                     $_SESSION['role'] = strtolower($row['role_name'] ?? '');
+                    $_SESSION['last_activity'] = time();
 
                     set_flash_message("Welcome back, " . htmlspecialchars($row['E_Fname']) . "!", "success");
 

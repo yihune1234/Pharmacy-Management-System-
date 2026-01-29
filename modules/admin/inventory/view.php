@@ -30,32 +30,40 @@
                         <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Category</th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Price (Rs)</th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Location</th>
+                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Barcode</th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     <?php
                     include "../../../config/config.php";
-                    $sql = "SELECT med_id, med_name, med_qty, category, med_price, location_rack FROM meds";
+                    $sql = "SELECT Med_ID, Med_Name, Med_Qty, Category, Med_Price, Location_Rack, Barcode, Min_Stock_Level FROM meds ORDER BY Med_Name";
                     $result = $conn->query($sql);
                     if ($result && $result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
-                            $stockColor = $row["med_qty"] < 20 ? 'text-red-600 font-bold' : 'text-slate-600';
+                            $stockColor = $row["Med_Qty"] <= $row["Min_Stock_Level"] ? 'text-red-600 font-bold' : 'text-slate-600';
+                            $stockBg = $row["Med_Qty"] <= $row["Min_Stock_Level"] ? 'bg-red-50' : 'bg-slate-50';
                             echo "<tr class='hover:bg-slate-50 transition-colors'>";
-                            echo "<td class='px-6 py-4 text-sm font-medium text-slate-400'>#" . $row["med_id"]. "</td>";
-                            echo "<td class='px-6 py-4 text-sm font-bold text-slate-900'>" . $row["med_name"] . "</td>";
-                            echo "<td class='px-6 py-4 text-sm $stockColor'>" . $row["med_qty"]. "</td>";
-                            echo "<td class='px-6 py-4 text-sm text-slate-600'><span class='bg-slate-100 px-3 py-1 rounded-full text-xs font-bold uppercase'>" . $row["category"]. "</span></td>";
-                            echo "<td class='px-6 py-4 text-sm font-black text-slate-900'>Rs. " . number_format($row["med_price"], 2) . "</td>";
-                            echo "<td class='px-6 py-4 text-sm text-slate-500'>" . $row["location_rack"]. "</td>";
+                            echo "<td class='px-6 py-4 text-sm font-medium text-slate-400'>#" . $row["Med_ID"]. "</td>";
+                            echo "<td class='px-6 py-4 text-sm font-bold text-slate-900'>" . $row["Med_Name"] . "</td>";
+                            echo "<td class='px-6 py-4 text-sm $stockColor'>";
+                            echo "<span class='$stockBg px-2 py-1 rounded-full text-xs'>" . $row["Med_Qty"]. "</span>";
+                            if ($row["Med_Qty"] <= $row["Min_Stock_Level"]) {
+                                echo " <span class='text-xs text-red-500'>⚠️ Low</span>";
+                            }
+                            echo "</td>";
+                            echo "<td class='px-6 py-4 text-sm text-slate-600'><span class='bg-slate-100 px-3 py-1 rounded-full text-xs font-bold uppercase'>" . $row["Category"]. "</span></td>";
+                            echo "<td class='px-6 py-4 text-sm font-black text-slate-900'>Rs. " . number_format($row["Med_Price"], 2) . "</td>";
+                            echo "<td class='px-6 py-4 text-sm text-slate-500'>" . $row["Location_Rack"]. "</td>";
+                            echo "<td class='px-6 py-4 text-sm text-slate-400'>" . ($row["Barcode"] ? $row["Barcode"] : '-') . "</td>";
                             echo "<td class='px-6 py-4 text-sm text-center'>";
-                            echo "<div class='flex items-center justify-center space-x-2'>";
-                            echo "<a class='bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition-all' href='update.php?id=".$row['med_id']."'>Edit</a>";
-                            echo "<a class='bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition-all' href='delete.php?id=".$row['med_id']."'>Delete</a>";
-                            echo "</div></td></tr>";
+                            echo "<a href='edit.php?id=" . $row["Med_ID"] . "' class='text-blue-600 hover:text-blue-800 font-bold text-sm mr-3'>Edit</a>";
+                            echo "<a href='delete.php?id=" . $row["Med_ID"] . "' onclick='return confirm(\"Are you sure you want to delete this medicine?\")' class='text-red-600 hover:text-red-800 font-bold text-sm'>Delete</a>";
+                            echo "</td>";
+                            echo "</tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='7' class='px-6 py-12 text-center text-slate-400 font-medium'>No inventory records found.</td></tr>";
+                        echo "<tr><td colspan='8' class='px-6 py-8 text-center text-slate-500'>No medicines found in inventory.</td></tr>";
                     }
                     $conn->close();
                     ?>

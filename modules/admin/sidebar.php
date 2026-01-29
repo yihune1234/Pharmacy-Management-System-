@@ -4,6 +4,11 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
 $path = ($current_dir == 'admin') ? '' : '../';
 
 require_once __DIR__ . '/../../includes/alerts.php';
+require_once __DIR__ . '/../../includes/session_check.php';
+
+// Validate admin access
+require_admin();
+validate_role_area('admin');
 ?>
 
 <!-- Tailwind CSS Base Setup -->

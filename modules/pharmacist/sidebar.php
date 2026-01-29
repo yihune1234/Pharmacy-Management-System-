@@ -4,6 +4,11 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
 $path = ($current_dir == 'pharmacist') ? '' : '../';
 
 require_once __DIR__ . '/../../includes/alerts.php';
+require_once __DIR__ . '/../../includes/session_check.php';
+
+// Validate pharmacist access
+require_pharmacist();
+validate_role_area('pharmacist');
 ?>
 
 <!-- Tailwind CSS Base Setup -->
