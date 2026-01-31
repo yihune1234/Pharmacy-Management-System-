@@ -105,15 +105,15 @@ if (isset($_POST['update_employee'])) {
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Birth Protocol</label>
-                            <input type="date" name="dob" value="<?php echo $employee['E_Bdate']; ?>"
+                            <input type="date" name="dob" value=""
                                 class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all outline-none font-bold text-slate-700">
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Gender Alias</label>
                             <select name="gender" 
                                 class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all outline-none font-bold text-slate-700 appearance-none">
-                                <option value="M" <?php echo ($employee['E_Sex'] == 'M' || $employee['E_Sex'] == 'Male') ? 'selected' : ''; ?>>Masculine</option>
-                                <option value="F" <?php echo ($employee['E_Sex'] == 'F' || $employee['E_Sex'] == 'Female') ? 'selected' : ''; ?>>Feminine</option>
+                                <option value="M">Masculine</option>
+                                <option value="F">Feminine</option>
                             </select>
                         </div>
                         <div>
