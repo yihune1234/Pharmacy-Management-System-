@@ -191,7 +191,7 @@ while($row = $monthly_sales->fetch_assoc()) {
     <div class="bg-white rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden mb-12">
         <div class="p-10 border-b border-slate-50 flex items-center justify-between">
             <h3 class="text-xl font-black text-slate-900 uppercase italic">Transactional Log</h3>
-            <a href="sales/view.php" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:tracking-tight transition-all">Audit full logs &rarr;</a>
+            <a href="sales/view_new.php" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:tracking-tight transition-all">Audit full logs &rarr;</a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left">
