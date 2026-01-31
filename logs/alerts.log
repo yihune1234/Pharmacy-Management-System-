@@ -27,3 +27,4 @@
 {"id":"697cac058705a","type":"critical","message":"Disk Space Critical","data":{"usage_percent":92.32,"free_space":"18.21 GB"},"timestamp":"2026-01-30 14:03:01","user_id":1,"ip_address":"::1"}
 {"id":"697e2ee95cd32","type":"critical","message":"Disk Space Critical","data":{"usage_percent":91.31,"free_space":"20.61 GB"},"timestamp":"2026-01-31 17:33:45","user_id":1,"ip_address":"::1"}
 {"id":"697e33a77f731","type":"critical","message":"Disk Space Critical","data":{"usage_percent":91.31,"free_space":"20.61 GB"},"timestamp":"2026-01-31 17:53:59","user_id":1,"ip_address":"::1"}
+{"id":"697e34123fab2","type":"critical","message":"Disk Space Critical","data":{"usage_percent":91.31,"free_space":"20.61 GB"},"timestamp":"2026-01-31 17:55:46","user_id":1,"ip_address":"::1"}
