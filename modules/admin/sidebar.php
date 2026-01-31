@@ -121,7 +121,7 @@ $low_stock = $low_stock_result->fetch_assoc()['count'] ?? 0;
                                     <span class="bg-rose-100 text-rose-600 text-[10px] font-black px-2 py-0.5 rounded-full border border-rose-200 alert-pulse"><?php echo $low_stock; ?></span>
                                 <?php endif; ?>
                             </a>
-                            <a href="<?php echo $path; ?>purchases/view.php" class="nav-item flex items-center space-x-3 px-4 py-3 text-slate-600">
+                            <a href="<?php echo $path; ?>purchases/view_new.php" class="nav-item flex items-center space-x-3 px-4 py-3 text-slate-600">
                                 <i class="fas fa-cart-flatbed text-lg text-indigo-500"></i>
                                 <span class="font-semibold text-sm text-slate-700">Procurement</span>
                             </a>
@@ -132,14 +132,14 @@ $low_stock = $low_stock_result->fetch_assoc()['count'] ?? 0;
                     <div>
                         <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Core Directory</p>
                         <div class="space-y-1">
-                            <a href="<?php echo $path; ?>customers/view.php" class="nav-item flex items-center justify-between px-4 py-3 text-slate-600">
+                            <a href="<?php echo $path; ?>customers/view_new.php" class="nav-item flex items-center justify-between px-4 py-3 text-slate-600">
                                 <span class="flex items-center space-x-3">
                                     <i class="fas fa-fingerprint text-lg text-emerald-500"></i>
                                     <span class="font-semibold text-sm text-slate-700">Patient Database</span>
                                 </span>
                                 <span class="text-[10px] font-black text-slate-400"><?php echo $total_customers; ?></span>
                             </a>
-                            <a href="<?php echo $path; ?>suppliers/view.php" class="nav-item flex items-center space-x-3 px-4 py-3 text-slate-600">
+                            <a href="<?php echo $path; ?>suppliers/view_new.php" class="nav-item flex items-center space-x-3 px-4 py-3 text-slate-600">
                                 <i class="fas fa-handshake-angle text-lg text-amber-500"></i>
                                 <span class="font-semibold text-sm text-slate-700">Partner Network</span>
                             </a>
