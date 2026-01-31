@@ -18,7 +18,7 @@ $sql = "SELECT c.*,
                MAX(s.S_Date) as Last_Purchase_Date,
                'Bronze' as Loyalty_Tier
         FROM customer c
-        LEFT JOIN sales s ON c.C_ID = s.C_ID AND s.Refunded = 0
+        LEFT JOIN sales s ON c.C_ID = s.C_ID
         GROUP BY c.C_ID
         ORDER BY c.C_ID DESC";
 
@@ -84,7 +84,7 @@ $result = $conn->query($sql);
                 <div>
                     <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Active This Month</p>
                     <p class="text-2xl font-black text-slate-900"><?php 
-                        $active_month = $conn->query("SELECT COUNT(DISTINCT C_ID) as count FROM sales WHERE MONTH(S_Date) = MONTH(CURDATE()) AND YEAR(S_Date) = YEAR(CURDATE()) AND Refunded = 0")->fetch_assoc()['count'];
+                        $active_month = $conn->query("SELECT COUNT(DISTINCT C_ID) as count FROM sales WHERE MONTH(S_Date) = MONTH(CURDATE()) AND YEAR(S_Date) = YEAR(CURDATE())")->fetch_assoc()['count'];
                         echo $active_month;
                     ?></p>
                 </div>
@@ -100,7 +100,7 @@ $result = $conn->query($sql);
                     <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Avg. Customer Value</p>
                     <p class="text-2xl font-black text-slate-900">Rs. <?php 
                         $avg_value = $total_customers > 0 ? 
-                            $conn->query("SELECT COALESCE(SUM(Total_Amt), 0) as total FROM sales WHERE Refunded = 0")->fetch_assoc()['total'] / $total_customers : 0;
+                            $conn->query("SELECT COALESCE(SUM(Total_Amt), 0) as total FROM sales")->fetch_assoc()['total'] / $total_customers : 0;
                         echo number_format($avg_value, 0);
                     ?></p>
                 </div>
