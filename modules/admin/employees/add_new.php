@@ -13,7 +13,7 @@ if (isset($_POST['add_employee'])) {
     $lname = $conn->real_escape_string($_POST['lname']);
     $email = $conn->real_escape_string($_POST['email']);
     $phone = $conn->real_escape_string($_POST['phone']);
-    $address = $conn->real_escape_string($_POST['address']);
+    $address = $conn->real_escape_string($_POST['address'] ?? '');
     $position = $conn->real_escape_string($_POST['position']);
     $salary = (float)$_POST['salary'];
     $role = $conn->real_escape_string($_POST['role']);

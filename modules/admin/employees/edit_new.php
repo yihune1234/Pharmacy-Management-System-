@@ -41,8 +41,8 @@ if (isset($_POST['update_employee'])) {
     $gender = $_POST['gender'] ?? 'M';
 
     if (!empty($fname) && !empty($lname)) {
-        $stmt = $conn->prepare("UPDATE employee SET E_Fname = ?, E_Lname = ?, E_Mail = ?, E_Phno = ?, E_Add = ?, E_Type = ?, E_Sal = ?, E_Bdate = ?, E_Sex = ? WHERE E_ID = ?");
-        $stmt->bind_param("ssssssdssi", $fname, $lname, $email, $phone, $address, $position, $salary, $dob, $gender, $employee_id);
+        $stmt = $conn->prepare("UPDATE employee SET E_Fname = ?, E_Lname = ?, E_Mail = ?, E_Phno = ?, E_Add = ?, E_Type = ?, E_Sal = ? WHERE E_ID = ?");
+        $stmt->bind_param("ssssssdi", $fname, $lname, $email, $phone, $address, $position, $salary, $employee_id);
         
         if ($stmt->execute()) {
             set_flash_message("Personnel records successfully synchronized for ID #$employee_id.", "success");
