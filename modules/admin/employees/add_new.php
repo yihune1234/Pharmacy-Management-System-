@@ -27,21 +27,21 @@ if (isset($_POST['add_employee'])) {
         $hashed_password = password_hash($default_password, PASSWORD_DEFAULT);
         
         // Check if username already exists
-        $check_sql = "SELECT E_ID FROM employee WHERE E_Username = '$username'";
+        $check_sql = "SELECT E_ID FROM employee WHERE username = '$username'";
         $check_result = $conn->query($check_sql);
         
         if ($check_result && $check_result->num_rows > 0) {
             $counter = 1;
             do {
                 $new_username = $username . $counter;
-                $check_sql = "SELECT E_ID FROM employee WHERE E_Username = '$new_username'";
+                $check_sql = "SELECT E_ID FROM employee WHERE username = '$new_username'";
                 $check_result = $conn->query($check_sql);
                 $counter++;
             } while ($check_result && $check_result->num_rows > 0);
             $username = $new_username;
         }
         
-        $sql = "INSERT INTO employee (E_Fname, E_Lname, E_Mail, E_Phno, E_Add, E_Type, E_Sal, E_Username, E_Password, E_Bdate, E_Sex, E_Jdate) 
+        $sql = "INSERT INTO employee (E_Fname, E_Lname, E_Mail, E_Phno, E_Add, E_Type, E_Sal, username, password, E_Bdate, E_Sex, E_Jdate) 
                 VALUES ('$fname', '$lname', '$email', '$phone', '$address', '$position', $salary, '$username', '$hashed_password', '$dob', '$gender', CURDATE())";
         
         if ($conn->query($sql)) {
@@ -124,6 +124,12 @@ if (isset($_POST['add_employee'])) {
                             <input type="tel" name="phone" placeholder="98XXXXXXXX"
                                 class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all outline-none font-bold text-slate-700">
                         </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Residential Sector (Address)</label>
+                        <textarea name="address" rows="2" placeholder="Full residential address..."
+                            class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all outline-none font-bold text-slate-700"></textarea>
                     </div>
 
                     <div>
