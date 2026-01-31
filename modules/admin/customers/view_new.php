@@ -9,18 +9,14 @@ validate_role_area('admin');
 
 // Get customer statistics
 $total_customers = $conn->query("SELECT COUNT(*) as count FROM customer")->fetch_assoc()['count'];
-$loyalty_customers = $conn->query("SELECT COUNT(*) as count FROM customer WHERE Loyalty_Points > 0")->fetch_assoc()['count'];
+$loyalty_customers = 0; // Default since column missing
 
 // Get customers with sales history
 $sql = "SELECT c.*, 
                COUNT(s.Sale_ID) as Total_Sales,
                COALESCE(SUM(s.Total_Amt), 0) as Total_Spent,
                MAX(s.S_Date) as Last_Purchase_Date,
-               CASE 
-                   WHEN c.Loyalty_Points >= 1000 THEN 'Gold'
-                   WHEN c.Loyalty_Points >= 500 THEN 'Silver'
-                   ELSE 'Bronze'
-               END as Loyalty_Tier
+               'Bronze' as Loyalty_Tier
         FROM customer c
         LEFT JOIN sales s ON c.C_ID = s.C_ID AND s.Refunded = 0
         GROUP BY c.C_ID
@@ -161,7 +157,7 @@ $result = $conn->query($sql);
                                     $tier = $customer['Loyalty_Tier'];
                                     ?>
                                     <span class="<?php echo $tier_color[$tier]; ?> px-3 py-1 rounded-full text-xs font-bold">
-                                        <?php echo $tier; ?> (<?php echo $customer['Loyalty_Points'] ?? 0; ?> pts)
+                                        <?php echo $tier; ?> (0 pts)
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-slate-600">
