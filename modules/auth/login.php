@@ -108,7 +108,7 @@ if (isset($_POST['submit'])) {
                 <!-- Replace with your logo image -->
                 <img src="../../assets/images/logo.png" alt="Pharma Logo" class="w-16 h-16 object-contain" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3063/3063067.png'">
             </div>
-            <h1 class="text-4xl font-black text-slate-900 tracking-tighter uppercase italic">Pharmacia</h1>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tighter uppercase italic">Pharmacy</h1>
             <div class="flex items-center space-x-2 mt-2">
                 <span class="h-[1px] w-8 bg-blue-600"></span>
                 <p class="text-[10px] font-black text-blue-600 uppercase tracking-[0.4em]">Integrated Intelligence</p>

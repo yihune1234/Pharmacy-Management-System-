@@ -22,3 +22,6 @@
 {"id":"697bd9f35b04b","type":"critical","message":"Disk Space Critical","data":{"usage_percent":93.16,"free_space":"16.21 GB"},"timestamp":"2026-01-29 23:06:43","user_id":1,"ip_address":"::1"}
 {"id":"697bdbd095f92","type":"warning","message":"Low Stock Alert: yihune","data":{"medicine_id":"1","current_stock":"3","location":"level1","threshold":10},"timestamp":"2026-01-29 23:14:40","user_id":1,"ip_address":"::1"}
 {"id":"697bdbd096e4c","type":"critical","message":"Disk Space Critical","data":{"usage_percent":92.86,"free_space":"16.93 GB"},"timestamp":"2026-01-29 23:14:40","user_id":1,"ip_address":"::1"}
+{"id":"697cab318024d","type":"critical","message":"Disk Space Critical","data":{"usage_percent":92.32,"free_space":"18.22 GB"},"timestamp":"2026-01-30 13:59:29","user_id":1,"ip_address":"::1"}
+{"id":"697cabc0d2823","type":"critical","message":"Disk Space Critical","data":{"usage_percent":92.32,"free_space":"18.22 GB"},"timestamp":"2026-01-30 14:01:52","user_id":1,"ip_address":"::1"}
+{"id":"697cac058705a","type":"critical","message":"Disk Space Critical","data":{"usage_percent":92.32,"free_space":"18.21 GB"},"timestamp":"2026-01-30 14:03:01","user_id":1,"ip_address":"::1"}
