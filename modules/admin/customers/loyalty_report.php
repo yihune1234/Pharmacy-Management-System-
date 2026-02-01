@@ -7,30 +7,15 @@ require_once __DIR__ . '/../../../includes/session_check.php';
 require_admin();
 validate_role_area('admin');
 
-// Get loyalty statistics
-$loyalty_stats = $conn->query("
-    SELECT 
-        Loyalty_Tier,
-        COUNT(*) as Customer_Count,
-        COALESCE(SUM(Loyalty_Points), 0) as Total_Points,
-        COALESCE(AVG(Loyalty_Points), 0) as Avg_Points
-    FROM customer 
-    GROUP BY Loyalty_Tier
-    ORDER BY 
-        CASE Loyalty_Tier 
-            WHEN 'Gold' THEN 1 
-            WHEN 'Silver' THEN 2 
-            WHEN 'Bronze' THEN 3 
-        END
-");
+// Get loyalty statistics (Mocked as columns missing)
+$loyalty_stats = false; 
 
-// Get top customers by points
+// Get top customers by spend (Used as proxy for loyalty)
 $top_customers = $conn->query("
-    SELECT C_ID, C_Fname, C_Lname, Loyalty_Points, Loyalty_Tier,
-           (SELECT COALESCE(SUM(Total_Amt), 0) FROM sales WHERE C_ID = c.C_ID AND Refunded = 0) as Total_Spent
+    SELECT C_ID, C_Fname, C_Lname, 0 as Loyalty_Points, 'Bronze' as Loyalty_Tier,
+           (SELECT COALESCE(SUM(Total_Amt), 0) FROM sales WHERE C_ID = c.C_ID) as Total_Spent
     FROM customer c
-    WHERE Loyalty_Points > 0
-    ORDER BY Loyalty_Points DESC
+    ORDER BY Total_Spent DESC
     LIMIT 10
 ");
 
@@ -38,32 +23,19 @@ $top_customers = $conn->query("
 $monthly_trends = $conn->query("
     SELECT DATE_FORMAT(Created_At, '%Y-%m') as Month,
            COUNT(*) as New_Customers,
-           SUM(CASE WHEN Loyalty_Points > 0 THEN 1 ELSE 0 END) as Loyalty_Customers
+           0 as Loyalty_Customers
     FROM customer
     WHERE Created_At >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
     GROUP BY DATE_FORMAT(Created_At, '%Y-%m')
     ORDER BY Month DESC
 ");
 
-// Get loyalty tier distribution
-$tier_distribution = $conn->query("
-    SELECT 
-        Loyalty_Tier,
-        COUNT(*) as count,
-        ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM customer), 2) as percentage
-    FROM customer
-    GROUP BY Loyalty_Tier
-    ORDER BY 
-        CASE Loyalty_Tier 
-            WHEN 'Gold' THEN 1 
-            WHEN 'Silver' THEN 2 
-            WHEN 'Bronze' THEN 3 
-        END
-");
+// Get loyalty tier distribution (Mocked)
+$tier_distribution = false;
 
-// Get recent loyalty activity
+// Get recent loyalty activity (Mocked as recent sales)
 $recent_activity = $conn->query("
-    SELECT c.C_Fname, c.C_Lname, c.Loyalty_Points, c.Loyalty_Tier, c.Updated_At,
+    SELECT c.C_Fname, c.C_Lname, 0 as Loyalty_Points, 'Bronze' as Loyalty_Tier, c.Updated_At,
            s.Sale_ID, s.Total_Amt
     FROM customer c
     LEFT JOIN sales s ON c.C_ID = s.C_ID AND DATE(s.S_Date) = DATE(c.Updated_At)
@@ -108,8 +80,8 @@ $recent_activity = $conn->query("
                 <div>
                     <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Total Members</p>
                     <p class="text-2xl font-black text-slate-900"><?php 
-                        $total_members = $conn->query("SELECT COUNT(*) as count FROM customer WHERE Loyalty_Points > 0")->fetch_assoc()['count'];
-                        echo $total_members;
+                        //$total_members = $conn->query("SELECT COUNT(*) as count FROM customer WHERE Loyalty_Points > 0")->fetch_assoc()['count'];
+                        echo 0; // Default
                     ?></p>
                 </div>
                 <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">
@@ -123,8 +95,8 @@ $recent_activity = $conn->query("
                 <div>
                     <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Gold Members</p>
                     <p class="text-2xl font-black text-slate-900"><?php 
-                        $gold_members = $conn->query("SELECT COUNT(*) as count FROM customer WHERE Loyalty_Tier = 'Gold'")->fetch_assoc()['count'];
-                        echo $gold_members;
+                        //$gold_members = $conn->query("SELECT COUNT(*) as count FROM customer WHERE Loyalty_Tier = 'Gold'")->fetch_assoc()['count'];
+                        echo 0;
                     ?></p>
                 </div>
                 <div class="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-xl flex items-center justify-center">
@@ -138,8 +110,8 @@ $recent_activity = $conn->query("
                 <div>
                     <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Total Points</p>
                     <p class="text-2xl font-black text-slate-900"><?php 
-                        $total_points = $conn->query("SELECT SUM(Loyalty_Points) as total FROM customer")->fetch_assoc()['total'];
-                        echo number_format($total_points, 0);
+                        //$total_points = $conn->query("SELECT SUM(Loyalty_Points) as total FROM customer")->fetch_assoc()['total'];
+                        echo 0;
                     ?></p>
                 </div>
                 <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
@@ -153,8 +125,8 @@ $recent_activity = $conn->query("
                 <div>
                     <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Avg Points</p>
                     <p class="text-2xl font-black text-slate-900"><?php 
-                        $avg_points = $conn->query("SELECT AVG(Loyalty_Points) as avg FROM customer WHERE Loyalty_Points > 0")->fetch_assoc()['avg'];
-                        echo number_format($avg_points, 0);
+                        //$avg_points = $conn->query("SELECT AVG(Loyalty_Points) as avg FROM customer WHERE Loyalty_Points > 0")->fetch_assoc()['avg'];
+                        echo 0;
                     ?></p>
                 </div>
                 <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
@@ -229,7 +201,7 @@ $recent_activity = $conn->query("
                                 <div>
                                     <div class="font-bold text-slate-900"><?php echo htmlspecialchars($activity['C_Fname'] . ' ' . $activity['C_Lname']); ?></div>
                                     <div class="text-sm text-slate-500">
-                                        <?php if ($activity['Sale_ID']): ?>
+                                        <?php if ($activity['Total_Amt'] > 0): ?>
                                             Purchase of Rs. <?php echo number_format($activity['Total_Amt'], 0); ?>
                                         <?php else: ?>
                                             Points updated

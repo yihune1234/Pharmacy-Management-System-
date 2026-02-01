@@ -1,15 +1,16 @@
 <?php
-$host = "localhost";
-$user = "root";
-$pass = "";
+$host = "mysql-25712907-yihunebelay859-f8f5.h.aivencloud.com";
+$user = "avnadmin";
+$pass = getenv('DB_PASS');
 $db   = "pharmacy_db";
+$port = 25713;
 
-/* Try connecting directly to the database */
-$conn = @new mysqli($host, $user, $pass, $db);
+$conn = mysqli_init();
+mysqli_ssl_set($conn, NULL, NULL, __DIR__ . "/ca.pem", NULL, NULL);
 
-/* If DB doesn't exist yet → go to installer */
-if ($conn->connect_error) {
-    header("Location: ./database/install.php");
-    exit();
+if (!mysqli_real_connect($conn, $host, $user, $pass, $db, $port, NULL, MYSQLI_CLIENT_SSL)) {
+    die("Aiven Connection Failed: " . mysqli_connect_error());
 }
+
+echo "Connected to Aiven successfully!";
 ?>
