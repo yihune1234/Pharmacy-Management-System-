@@ -1,6 +1,10 @@
-<?php
 require_once __DIR__ . '/../../../config/config.php';
 require_once __DIR__ . '/../../../includes/alerts.php';
+require_once __DIR__ . '/../../../includes/session_check.php';
+
+// Validate cashier access
+require_cashier();
+validate_role_area('cashier');
 
 if (isset($_POST['add'])) {
     $fname = $conn->real_escape_string($_POST['cfname']);

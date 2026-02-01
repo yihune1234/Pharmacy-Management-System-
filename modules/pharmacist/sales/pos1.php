@@ -1,6 +1,10 @@
-<?php
 require_once __DIR__ . '/../../../config/config.php';
 require_once __DIR__ . '/../../../includes/alerts.php';
+require_once __DIR__ . '/../../../includes/session_check.php';
+
+// Validate pharmacist access
+require_pharmacist();
+validate_role_area('pharmacist');
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

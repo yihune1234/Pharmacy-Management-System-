@@ -1,6 +1,10 @@
-<?php
 require_once __DIR__ . '/../../../config/config.php';
 require_once __DIR__ . '/../../../includes/alerts.php';
+require_once __DIR__ . '/../../../includes/session_check.php';
+
+// Validate cashier access
+require_cashier();
+validate_role_area('cashier');
 
 $sid = $_GET['sid'] ?? $_GET['slid'] ?? null;
 $mid = $_GET['mid'] ?? null;
