@@ -197,7 +197,7 @@ if (isset($_POST['add_customer'])) {
                 <?php 
                 $medicines->data_seek(0);
                 $count = 0;
-                while($medicine = $medicines->fetch_assoc() && $count < 8): 
+                while(($medicine = $medicines->fetch_assoc()) && $count < 8): 
                 ?>
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
                         <div class="font-bold text-slate-900 text-sm"><?php echo htmlspecialchars($medicine['Med_Name']); ?></div>

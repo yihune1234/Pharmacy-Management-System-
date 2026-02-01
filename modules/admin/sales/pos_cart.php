@@ -14,6 +14,14 @@ if (!isset($_SESSION['pos_customer_id'])) {
     exit();
 }
 
+// Handle clear cart
+if (isset($_GET['clear_cart'])) {
+    unset($_SESSION['pos_items']);
+    set_flash_message("Cart cleared.", "success");
+    header("Location: pos_cart.php");
+    exit();
+}
+
 $customer_id = $_SESSION['pos_customer_id'];
 $customer_info = null;
 
@@ -370,16 +378,6 @@ foreach ($_SESSION['pos_items'] as $item) {
                 window.location.href = '?clear_cart=1';
             }
         }
-
-        // Handle clear cart
-        <?php if (isset($_GET['clear_cart'])): ?>
-            <?php 
-            unset($_SESSION['pos_items']);
-            set_flash_message("Cart cleared.", "success");
-            header("Location: pos_cart.php");
-            exit();
-            ?>
-        <?php endif; ?>
     </script>
 
     <!-- Closing tags from sidebar.php -->
