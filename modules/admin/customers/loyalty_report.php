@@ -56,167 +56,142 @@ $recent_activity = $conn->query("
 <body class="bg-slate-50">
     <?php require('../sidebar.php'); ?>
 
-    <div class="mb-10 flex items-center justify-between">
+    <div class="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
         <div>
-            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Loyalty Program Report</h2>
-            <p class="text-slate-500 mt-1 font-medium">Customer loyalty analytics and performance metrics</p>
+            <p class="subheading-premium">Loyalty Intelligence</p>
+            <h1 class="heading-premium">Reward Protocol</h1>
+            <p class="text-slate-500 mt-1 font-medium">Customer retention analytics and value distribution.</p>
         </div>
-        <div class="flex space-x-3">
-            <button onclick="window.print()" class="bg-white text-slate-600 px-6 py-3 rounded-2xl font-bold text-sm border border-slate-200 hover:bg-slate-50 transition-all flex items-center shadow-sm">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                Print Report
+        <div class="flex items-center space-x-3">
+            <button onclick="window.print()" class="bg-white border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold text-slate-600 shadow-sm hover:bg-slate-50 transition-all flex items-center">
+                <i class="fas fa-print mr-2 text-slate-400"></i> Generate PDF
             </button>
-            <a href="view_new.php" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                Manage Customers
+            <a href="view_new.php" class="btn-primary btn-blue !px-8">
+                <i class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"></i> Return to Portfolio
             </a>
         </div>
     </div>
 
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Total Members</p>
-                    <p class="text-2xl font-black text-slate-900"><?php 
-                        //$total_members = $conn->query("SELECT COUNT(*) as count FROM customer WHERE Loyalty_Points > 0")->fetch_assoc()['count'];
-                        echo 0; // Default
-                    ?></p>
+    <!-- Analytics Hub -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <div class="premium-card p-8">
+            <div class="stat-icon bg-amber-50 text-amber-600 mb-6">
+                <i class="fas fa-crown text-xl"></i>
+            </div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Members</p>
+            <h3 class="text-3xl font-black text-slate-900 leading-none">0</h3>
+            <p class="text-[10px] font-bold text-amber-500 mt-3 uppercase tracking-widest">Active Loyalty Base</p>
+        </div>
+
+        <div class="premium-card p-8 bg-slate-900 !border-slate-800 shadow-2xl">
+            <div class="relative z-10">
+                <div class="stat-icon bg-white/10 text-white backdrop-blur mb-6">
+                    <i class="fas fa-star text-xl"></i>
                 </div>
-                <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
-                </div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">High Value</p>
+                <h3 class="text-3xl font-black text-white leading-none">0</h3>
+                <p class="text-[10px] font-bold text-amber-400 mt-3 uppercase tracking-widest">Elite Tier Count</p>
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Gold Members</p>
-                    <p class="text-2xl font-black text-slate-900"><?php 
-                        //$gold_members = $conn->query("SELECT COUNT(*) as count FROM customer WHERE Loyalty_Tier = 'Gold'")->fetch_assoc()['count'];
-                        echo 0;
-                    ?></p>
-                </div>
-                <div class="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
-                </div>
+        <div class="premium-card p-8">
+            <div class="stat-icon bg-emerald-50 text-emerald-600 mb-6">
+                <i class="fas fa-coins text-xl"></i>
             </div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Points</p>
+            <h3 class="text-3xl font-black text-slate-900 leading-none">0</h3>
+            <p class="text-[10px] font-bold text-emerald-500 mt-3 uppercase tracking-widest">Global Rewards Pool</p>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Total Points</p>
-                    <p class="text-2xl font-black text-slate-900"><?php 
-                        //$total_points = $conn->query("SELECT SUM(Loyalty_Points) as total FROM customer")->fetch_assoc()['total'];
-                        echo 0;
-                    ?></p>
-                </div>
-                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
+        <div class="premium-card p-8">
+            <div class="stat-icon bg-blue-50 text-blue-600 mb-6">
+                <i class="fas fa-chart-line text-xl"></i>
             </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Avg Points</p>
-                    <p class="text-2xl font-black text-slate-900"><?php 
-                        //$avg_points = $conn->query("SELECT AVG(Loyalty_Points) as avg FROM customer WHERE Loyalty_Points > 0")->fetch_assoc()['avg'];
-                        echo 0;
-                    ?></p>
-                </div>
-                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
-                </div>
-            </div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Avg Points</p>
+            <h3 class="text-3xl font-black text-slate-900 leading-none">0</h3>
+            <p class="text-[10px] font-bold text-blue-500 mt-3 uppercase tracking-widest">Per Capita Level</p>
         </div>
     </div>
 
     <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <!-- Tier Distribution Chart -->
-        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-            <h3 class="text-lg font-bold text-slate-900 mb-6">Tier Distribution</h3>
-            <canvas id="tierChart" width="400" height="200"></canvas>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-12">
+        <div class="premium-card p-10">
+            <h3 class="text-lg font-black text-slate-900 uppercase italic mb-8">Tier Distribution</h3>
+            <div class="h-64 relative">
+                <canvas id="tierChart"></canvas>
+            </div>
         </div>
 
-        <!-- Monthly Trends Chart -->
-        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-            <h3 class="text-lg font-bold text-slate-900 mb-6">Monthly Customer Acquisition</h3>
-            <canvas id="monthlyChart" width="400" height="200"></canvas>
+        <div class="premium-card p-10">
+            <h3 class="text-lg font-black text-slate-900 uppercase italic mb-8">Acquisition Velocity</h3>
+            <div class="h-64 relative">
+                <canvas id="monthlyChart"></canvas>
+            </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <!-- Top Customers -->
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="bg-gradient-to-r from-amber-50 to-orange-50 px-8 py-6 border-b border-slate-200">
-                <h3 class="text-xl font-bold text-slate-900">Top Loyalty Customers</h3>
-                <p class="text-slate-600 mt-2">Customers with highest loyalty points</p>
+        <div class="premium-card overflow-hidden !p-0">
+            <div class="p-8 border-b border-slate-50 bg-slate-50/50">
+                <h3 class="text-lg font-black text-slate-900 uppercase italic">Key Loyalty Assets</h3>
+                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">High Frequency Partners</p>
             </div>
             
-            <div class="p-6">
+            <div class="p-8 space-y-6">
                 <?php if ($top_customers && $top_customers->num_rows > 0): ?>
-                    <div class="space-y-4">
-                        <?php while($customer = $top_customers->fetch_assoc()): ?>
-                            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                                <div class="flex items-center space-x-4">
-                                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center font-bold">
-                                        <?php echo strtoupper(substr($customer['C_Fname'], 0, 1)); ?>
-                                    </div>
-                                    <div>
-                                        <div class="font-bold text-slate-900"><?php echo htmlspecialchars($customer['C_Fname'] . ' ' . $customer['C_Lname']); ?></div>
-                                        <div class="text-sm text-slate-500"><?php echo $customer['Loyalty_Tier']; ?> Tier</div>
-                                    </div>
+                    <?php while($customer = $top_customers->fetch_assoc()): ?>
+                        <div class="flex items-center justify-between p-5 bg-slate-50/50 rounded-2xl border border-slate-100 hover:border-blue-200 transition-all hover:translate-x-1 group">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center font-black text-xs text-slate-400 group-hover:bg-blue-600 group-hover:text-white shadow-sm transition-all border border-slate-100">
+                                    <?php echo strtoupper(substr($customer['C_Fname'], 0, 1)); ?>
                                 </div>
-                                <div class="text-right">
-                                    <div class="font-bold text-slate-900"><?php echo number_format($customer['Loyalty_Points']); ?> pts</div>
-                                    <div class="text-sm text-slate-500">Rs. <?php echo number_format($customer['Total_Spent'], 0); ?></div>
+                                <div>
+                                    <div class="text-sm font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase italic"><?php echo htmlspecialchars($customer['C_Fname'] . ' ' . $customer['C_Lname']); ?></div>
+                                    <div class="text-[10px] font-bold text-amber-500 uppercase tracking-tighter italic"><?php echo $customer['Loyalty_Tier']; ?> Protocol</div>
                                 </div>
                             </div>
-                        <?php endwhile; ?>
-                    </div>
+                            <div class="text-right">
+                                <div class="text-sm font-black text-slate-900 italic"><?php echo number_format($customer['Loyalty_Points']); ?> PTS</div>
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter italic">Rs. <?php echo number_format($customer['Total_Spent'], 0); ?> TOTAL</div>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
                 <?php else: ?>
-                    <p class="text-slate-500 text-center py-8">No loyalty customers found</p>
+                    <p class="text-slate-400 font-bold italic text-center py-8">No loyalty synchronization.</p>
                 <?php endif; ?>
             </div>
         </div>
 
         <!-- Recent Activity -->
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-8 py-6 border-b border-slate-200">
-                <h3 class="text-xl font-bold text-slate-900">Recent Activity</h3>
-                <p class="text-slate-600 mt-2">Latest loyalty program updates</p>
+        <div class="premium-card overflow-hidden !p-0">
+            <div class="p-8 border-b border-slate-50 bg-slate-50/50">
+                <h3 class="text-lg font-black text-slate-900 uppercase italic">Recent Operations</h3>
+                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">Live Program Flux</p>
             </div>
             
-            <div class="p-6">
+            <div class="p-8 space-y-6">
                 <?php if ($recent_activity && $recent_activity->num_rows > 0): ?>
-                    <div class="space-y-4">
-                        <?php while($activity = $recent_activity->fetch_assoc()): ?>
-                            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                                <div>
-                                    <div class="font-bold text-slate-900"><?php echo htmlspecialchars($activity['C_Fname'] . ' ' . $activity['C_Lname']); ?></div>
-                                    <div class="text-sm text-slate-500">
-                                        <?php if ($activity['Total_Amt'] > 0): ?>
-                                            Purchase of Rs. <?php echo number_format($activity['Total_Amt'], 0); ?>
-                                        <?php else: ?>
-                                            Points updated
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <div class="font-bold text-slate-900"><?php echo $activity['Loyalty_Points']; ?> pts</div>
-                                    <div class="text-xs text-slate-400"><?php echo date('M j, Y', strtotime($activity['Updated_At'])); ?></div>
+                    <?php while($activity = $recent_activity->fetch_assoc()): ?>
+                        <div class="flex items-center justify-between p-5 bg-slate-50/50 rounded-2xl border border-slate-100 hover:border-emerald-200 transition-all group">
+                            <div>
+                                <div class="text-sm font-black text-slate-900 group-hover:text-emerald-600 transition-colors uppercase italic"><?php echo htmlspecialchars($activity['C_Fname'] . ' ' . $activity['C_Lname']); ?></div>
+                                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter italic">
+                                    <?php if ($activity['Total_Amt'] > 0): ?>
+                                        TRANSACTION: RS. <?php echo number_format($activity['Total_Amt'], 0); ?>
+                                    <?php else: ?>
+                                        SYSTEM REVALUATION
+                                    <?php endif; ?>
                                 </div>
                             </div>
-                        <?php endwhile; ?>
-                    </div>
+                            <div class="text-right">
+                                <div class="text-sm font-black text-slate-900 italic">+<?php echo $activity['Loyalty_Points']; ?> PTS</div>
+                                <div class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]"><?php echo date('d M Y', strtotime($activity['Updated_At'])); ?></div>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
                 <?php else: ?>
-                    <p class="text-slate-500 text-center py-8">No recent activity</p>
+                    <p class="text-slate-400 font-bold italic text-center py-8">No recent log entries.</p>
                 <?php endif; ?>
             </div>
         </div>

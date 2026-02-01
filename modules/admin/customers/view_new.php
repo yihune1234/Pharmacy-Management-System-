@@ -36,160 +36,142 @@ $result = $conn->query($sql);
 <body class="bg-slate-50">
     <?php require('../sidebar.php'); ?>
 
-    <div class="mb-10 flex items-center justify-between">
+    <div class="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
         <div>
-            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Customer Management</h2>
-            <p class="text-slate-500 mt-1 font-medium">Manage customers and track purchase history</p>
+            <p class="subheading-premium">Relationship Management</p>
+            <h1 class="heading-premium">Customer Portfolio</h1>
+            <p class="text-slate-500 mt-1 font-medium">Manage patients and track transactional history.</p>
         </div>
-        <div class="flex space-x-3">
-            <a href="loyalty_report.php" class="bg-white text-slate-600 px-6 py-3 rounded-2xl font-bold text-sm border border-slate-200 hover:bg-slate-50 transition-all flex items-center shadow-sm">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                Loyalty Report
+        <div class="flex items-center space-x-3">
+            <a href="loyalty_report.php" class="bg-white border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold text-slate-600 shadow-sm hover:bg-slate-50 transition-all flex items-center">
+                <i class="fas fa-crown mr-2 text-amber-500"></i> Loyalty Analytics
             </a>
-            <a href="add_new.php" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Add Customer
+            <a href="add_new.php" class="btn-primary btn-blue !px-8">
+                <i class="fas fa-user-plus mr-3 transform group-hover:scale-110 transition-transform"></i> Register Member
             </a>
         </div>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Total Customers</p>
-                    <p class="text-2xl font-black text-slate-900"><?php echo $total_customers; ?></p>
+    <!-- Analytics Hub -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <div class="premium-card p-8">
+            <div class="stat-icon bg-blue-50 text-blue-600 mb-6">
+                <i class="fas fa-users text-xl"></i>
+            </div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Base Size</p>
+            <h3 class="text-3xl font-black text-slate-900 leading-none"><?php echo $total_customers; ?></h3>
+            <p class="text-[10px] font-bold text-blue-500 mt-3 uppercase">Registered Members</p>
+        </div>
+
+        <div class="premium-card p-8 bg-slate-900 !border-slate-800 shadow-2xl">
+            <div class="relative z-10">
+                <div class="stat-icon bg-white/10 text-white backdrop-blur mb-6">
+                    <i class="fas fa-gem text-xl"></i>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                </div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Loyalty Tier</p>
+                <h3 class="text-3xl font-black text-white leading-none"><?php echo $loyalty_customers; ?></h3>
+                <p class="text-[10px] font-bold text-amber-400 mt-3 uppercase tracking-widest">Premium Members</p>
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Loyalty Members</p>
-                    <p class="text-2xl font-black text-slate-900"><?php echo $loyalty_customers; ?></p>
-                </div>
-                <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
-                </div>
+        <div class="premium-card p-8">
+            <div class="stat-icon bg-emerald-50 text-emerald-600 mb-6">
+                <i class="fas fa-pulse text-xl"></i>
             </div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Retention</p>
+            <h3 class="text-3xl font-black text-slate-900 leading-none"><?php 
+                $active_month = $conn->query("SELECT COUNT(DISTINCT C_ID) as count FROM sales WHERE MONTH(S_Date) = MONTH(CURDATE()) AND YEAR(S_Date) = YEAR(CURDATE())")->fetch_assoc()['count'];
+                echo $active_month;
+            ?></h3>
+            <p class="text-[10px] font-bold text-emerald-500 mt-3 uppercase tracking-tighter">Active This Month</p>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Active This Month</p>
-                    <p class="text-2xl font-black text-slate-900"><?php 
-                        $active_month = $conn->query("SELECT COUNT(DISTINCT C_ID) as count FROM sales WHERE MONTH(S_Date) = MONTH(CURDATE()) AND YEAR(S_Date) = YEAR(CURDATE())")->fetch_assoc()['count'];
-                        echo $active_month;
-                    ?></p>
-                </div>
-                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                </div>
+        <div class="premium-card p-8">
+            <div class="stat-icon bg-purple-50 text-purple-600 mb-6">
+                <i class="fas fa-coins text-xl"></i>
             </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Avg. Customer Value</p>
-                    <p class="text-2xl font-black text-slate-900">Rs. <?php 
-                        $avg_value = $total_customers > 0 ? 
-                            $conn->query("SELECT COALESCE(SUM(Total_Amt), 0) as total FROM sales")->fetch_assoc()['total'] / $total_customers : 0;
-                        echo number_format($avg_value, 0);
-                    ?></p>
-                </div>
-                <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-            </div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Unit LTV</p>
+            <h3 class="text-3xl font-black text-slate-900 leading-none">Rs. <?php 
+                $avg_value = $total_customers > 0 ? 
+                    $conn->query("SELECT COALESCE(SUM(Total_Amt), 0) as total FROM sales")->fetch_assoc()['total'] / $total_customers : 0;
+                echo number_format($avg_value, 0);
+            ?></h3>
+            <p class="text-[10px] font-bold text-purple-500 mt-3 uppercase tracking-tighter">Average Life Value</p>
         </div>
     </div>
 
-    <!-- Customer Table -->
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-8 py-6 border-b border-slate-200">
-            <h3 class="text-xl font-bold text-slate-900">Customer Directory</h3>
-            <p class="text-slate-600 mt-2">Complete customer database with purchase history and loyalty status</p>
+    <!-- Technical Matrix Table -->
+    <div class="premium-card overflow-hidden">
+        <div class="p-8 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
+            <h3 class="text-lg font-black text-slate-900 uppercase italic">Customer Directory</h3>
+            <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-blue-500 pulse"></span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Live Database</span>
+            </div>
         </div>
         
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-slate-50">
+            <table class="w-full text-left">
+                <thead class="bg-white">
                     <tr>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Customer ID</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Name</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Contact</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Total Sales</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Total Spent</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Loyalty Status</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Last Purchase</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+                        <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Signature</th>
+                        <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Member Identity</th>
+                        <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Communication</th>
+                        <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Frequency</th>
+                        <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Gross Volume</th>
+                        <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Protocol</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-slate-50">
                     <?php if ($result && $result->num_rows > 0): ?>
                         <?php while($customer = $result->fetch_assoc()): ?>
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="px-6 py-4 text-sm font-medium text-slate-400">#<?php echo str_pad($customer['C_ID'], 5, '0', STR_PAD_LEFT); ?></td>
-                                <td class="px-6 py-4 text-sm">
-                                    <div class="font-bold text-slate-900"><?php echo htmlspecialchars($customer['C_Fname'] . ' ' . $customer['C_Lname']); ?></div>
-                                    <div class="text-xs text-slate-500">Age: <?php echo $customer['C_Age']; ?> | <?php echo $customer['C_Sex']; ?></div>
+                            <tr class="hover:bg-blue-50/30 transition-all group">
+                                <td class="px-8 py-6">
+                                    <span class="text-[10px] font-black text-slate-400 tracking-widest">#MBR-<?php echo str_pad($customer['C_ID'], 4, '0', STR_PAD_LEFT); ?></span>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-slate-600">
-                                    <div class="text-xs"><?php echo htmlspecialchars($customer['C_Phno'] ?? 'N/A'); ?></div>
-                                    <div class="text-xs text-slate-400"><?php echo htmlspecialchars($customer['C_Mail'] ?? 'N/A'); ?></div>
+                                <td class="px-8 py-6">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center font-black text-xs text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                            <?php echo strtoupper(substr($customer['C_Fname'], 0, 1)); ?>
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-black text-slate-900 group-hover:text-blue-600 transition-colors italic"><?php echo htmlspecialchars($customer['C_Fname'] . ' ' . $customer['C_Lname']); ?></span>
+                                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter italic"><?php echo $customer['C_Age']; ?> YRS | <?php echo $customer['C_Sex']; ?> Classification</span>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td class="px-6 py-4 text-sm">
-                                    <span class="bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs font-bold">
-                                        <?php echo $customer['Total_Sales']; ?> sales
+                                <td class="px-8 py-6">
+                                    <div class="flex flex-col">
+                                        <span class="text-xs font-bold text-slate-600"><?php echo htmlspecialchars($customer['C_Phno'] ?? 'NULL'); ?></span>
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic"><?php echo htmlspecialchars($customer['C_Mail'] ?? 'NO_ANCHOR'); ?></span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-6 text-center">
+                                    <span class="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest italic border border-blue-100">
+                                        <?php echo $customer['Total_Sales']; ?> PROTOCOLS
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 text-sm font-black text-slate-900">Rs. <?php echo number_format($customer['Total_Spent'], 2); ?></td>
-                                <td class="px-6 py-4 text-sm">
-                                    <?php
-                                    $tier_color = ['Bronze' => 'bg-slate-100 text-slate-700', 'Silver' => 'bg-gray-100 text-gray-700', 'Gold' => 'bg-amber-100 text-amber-700'];
-                                    $tier = $customer['Loyalty_Tier'];
-                                    ?>
-                                    <span class="<?php echo $tier_color[$tier]; ?> px-3 py-1 rounded-full text-xs font-bold">
-                                        <?php echo $tier; ?> (0 pts)
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-slate-600">
-                                    <?php if ($customer['Last_Purchase_Date']): ?>
-                                        <?php echo date('M j, Y', strtotime($customer['Last_Purchase_Date'])); ?>
-                                    <?php else: ?>
-                                        <span class="text-slate-400">No purchases</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-center">
-                                    <a href="customer_history.php?id=<?php echo $customer['C_ID']; ?>" 
-                                       class="text-blue-600 hover:text-blue-800 font-bold text-sm mr-3">
-                                        History
-                                    </a>
-                                    <a href="edit_new.php?id=<?php echo $customer['C_ID']; ?>" 
-                                       class="text-emerald-600 hover:text-emerald-800 font-bold text-sm mr-3">
-                                        Edit
-                                    </a>
-                                    <a href="customer_invoices.php?id=<?php echo $customer['C_ID']; ?>" 
-                                       class="text-purple-600 hover:text-purple-800 font-bold text-sm">
-                                        Invoices
-                                    </a>
+                                <td class="px-8 py-6 text-right font-black text-slate-900 italic">Rs. <?php echo number_format($customer['Total_Spent'], 0); ?></td>
+                                <td class="px-8 py-6">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <a href="customer_history.php?id=<?php echo $customer['C_ID']; ?>" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                                            <i class="fas fa-clock-rotate-left text-xs"></i>
+                                        </a>
+                                        <a href="edit_new.php?id=<?php echo $customer['C_ID']; ?>" class="w-9 h-9 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                                            <i class="fas fa-user-pen text-xs"></i>
+                                        </a>
+                                        <a href="customer_invoices.php?id=<?php echo $customer['C_ID']; ?>" class="w-9 h-9 flex items-center justify-center rounded-xl bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white transition-all shadow-sm">
+                                            <i class="fas fa-file-invoice-dollar text-xs"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="8" class="px-6 py-8 text-center text-slate-500">
-                                <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                </svg>
-                                No customers found
+                            <td colspan="6" class="px-8 py-24 text-center">
+                                <div class="opacity-10 mb-4 text-5xl"><i class="fas fa-users-slash"></i></div>
+                                <p class="text-slate-400 font-bold italic">No member synchronization found.</p>
                             </td>
                         </tr>
                     <?php endif; ?>

@@ -51,12 +51,12 @@ $recent_transactions = $conn->query("
 
     <div class="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
         <div>
-            <h2 class="text-xs font-black text-blue-600 uppercase tracking-widest mb-1">Session Protocol</h2>
-            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Cashier Terminal</h1>
+            <p class="subheading-premium">Session Protocol</p>
+            <h1 class="heading-premium">Cashier Terminal</h1>
             <p class="text-slate-500 font-medium mt-1">Authorized access for <?php echo htmlspecialchars($_SESSION['name']); ?>.</p>
         </div>
         <div class="flex items-center space-x-3">
-             <a href="sales/pos1.php" class="bg-blue-600 text-white px-8 py-4 rounded-2xl text-sm font-black shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all flex items-center group">
+             <a href="sales/pos1.php" class="btn-primary btn-blue">
                 <i class="fas fa-plus mr-3 group-hover:rotate-90 transition-transform"></i> New Transaction
             </a>
         </div>
@@ -64,27 +64,26 @@ $recent_transactions = $conn->query("
 
     <!-- Quick Stats Hub -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-        <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40">
-            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6">
+        <div class="premium-card p-8">
+            <div class="stat-icon bg-blue-50 text-blue-600">
                 <i class="fas fa-receipt text-xl"></i>
             </div>
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Today's Tickets</p>
             <h3 class="text-3xl font-black text-slate-900 leading-none"><?php echo $today_sales_count; ?></h3>
         </div>
         
-        <div class="bg-slate-900 p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden">
+        <div class="premium-card p-8 bg-slate-900 !border-slate-800 shadow-2xl">
             <div class="relative z-10">
-                <div class="w-12 h-12 bg-white/10 text-white rounded-2xl flex items-center justify-center mb-6 backdrop-blur">
+                <div class="stat-icon bg-white/10 text-white backdrop-blur">
                     <i class="fas fa-cash-register text-xl"></i>
                 </div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Terminal Revenue</p>
                 <h3 class="text-3xl font-black text-white leading-none">Rs. <?php echo number_format($today_revenue, 2); ?></h3>
             </div>
-            <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-blue-600/20 rounded-full blur-2xl"></div>
         </div>
 
-        <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40">
-            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
+        <div class="premium-card p-8">
+            <div class="stat-icon bg-emerald-50 text-emerald-600">
                 <i class="fas fa-user-check text-xl"></i>
             </div>
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Patients Served</p>
@@ -95,14 +94,14 @@ $recent_transactions = $conn->query("
     <!-- Main Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <!-- Recent Activity -->
-        <div class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40">
+        <div class="premium-card p-10">
             <h3 class="text-xl font-black text-slate-900 uppercase italic mb-8">Recent Transactions</h3>
             <div class="space-y-4">
                 <?php if ($recent_transactions && $recent_transactions->num_rows > 0): ?>
                     <?php while($row = $recent_transactions->fetch_assoc()): ?>
-                    <div class="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-transparent hover:border-blue-200 transition-all">
+                    <div class="flex items-center justify-between p-5 bg-slate-50/50 rounded-2xl border border-transparent hover:border-blue-200 transition-all group">
                         <div class="flex items-center space-x-4">
-                            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm border border-slate-100">
+                            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white shadow-sm transition-all">
                                 <i class="fas fa-file-invoice text-xs"></i>
                             </div>
                             <div>
@@ -110,7 +109,7 @@ $recent_transactions = $conn->query("
                                 <p class="text-[10px] text-slate-400 font-bold uppercase"><?php echo date('h:i A', strtotime($row['S_Time'])); ?></p>
                             </div>
                         </div>
-                        <p class="text-sm font-black text-slate-900">Rs. <?php echo number_format($row['Total_Amt'], 2); ?></p>
+                        <p class="text-sm font-black text-slate-900">Rs. <?php echo number_format($row['Total_Amt'], 0); ?></p>
                     </div>
                     <?php endwhile; ?>
                 <?php else: ?>
@@ -123,7 +122,7 @@ $recent_transactions = $conn->query("
 
         <!-- System Shortcuts -->
         <div class="grid grid-cols-1 gap-6">
-            <a href="sales/pos1.php" class="bg-blue-600 p-8 rounded-[2.5rem] shadow-xl shadow-blue-200 flex items-center justify-between group">
+            <a href="sales/pos1.php" class="premium-card bg-blue-600 p-8 shadow-xl shadow-blue-200 flex items-center justify-between group !rounded-[2rem]">
                 <div class="flex items-center space-x-6">
                     <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-white text-2xl backdrop-blur">
                         <i class="fas fa-cart-plus"></i>
@@ -136,10 +135,10 @@ $recent_transactions = $conn->query("
                 <i class="fas fa-chevron-right text-white/50 group-hover:translate-x-2 transition-transform"></i>
             </a>
 
-            <a href="customers/view.php" class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 flex items-center justify-between group">
+            <a href="customers/view.php" class="premium-card p-8 flex items-center justify-between group !rounded-[2rem]">
                 <div class="flex items-center space-x-6">
-                    <div class="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 text-2xl">
-                        <i class="fas fa-id-badge"></i>
+                    <div class="stat-icon !mb-0 bg-emerald-50 text-emerald-600 text-2xl">
+                        <i class="fas fa-id-badge text-xl"></i>
                     </div>
                     <div>
                         <h4 class="text-xl font-black text-slate-900 uppercase italic">Patient Lookup</h4>

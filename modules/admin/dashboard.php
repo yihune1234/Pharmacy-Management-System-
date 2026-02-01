@@ -76,15 +76,15 @@ while($row = $monthly_sales->fetch_assoc()) {
     <!-- Welcome Header -->
     <div class="mb-10 flex flex-col md:flex-row md:items-end md:justify-between space-y-4 md:space-y-0">
         <div>
-            <h2 class="text-xs font-black text-blue-600 uppercase tracking-widest mb-1">Intelligence Overview</h2>
-            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">System Dashboard</h1>
+            <p class="subheading-premium">Intelligence Overview</p>
+            <h1 class="heading-premium">System Dashboard</h1>
             <p class="text-slate-500 font-medium mt-1">Operational status for <?php echo date('l, F j, Y'); ?></p>
         </div>
         <div class="flex items-center space-x-3">
-            <button class="bg-white border border-slate-200 px-5 py-2.5 rounded-2xl text-sm font-bold text-slate-600 shadow-sm hover:bg-slate-50 transition-all flex items-center">
+            <button class="bg-white border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold text-slate-600 shadow-sm hover:bg-slate-50 transition-all flex items-center">
                 <i class="fas fa-calendar-alt mr-2"></i> Monthly Range
             </button>
-            <button class="bg-blue-600 text-white px-6 py-2.5 rounded-2xl text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all flex items-center">
+            <button class="btn-primary btn-blue">
                 <i class="fas fa-file-export mr-2"></i> Export Data
             </button>
         </div>
@@ -92,65 +92,58 @@ while($row = $monthly_sales->fetch_assoc()) {
 
     <!-- Analytics Pulse -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-        <!-- Card 1 -->
-        <div class="stat-card bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden">
-            <div class="relative z-10">
-                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6">
-                    <i class="fas fa-layer-group text-xl"></i>
-                </div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Current Volume</p>
-                <div class="flex items-end space-x-2">
-                    <h3 class="text-4xl font-black text-slate-900 leading-none"><?php echo $today_sales; ?></h3>
-                    <span class="text-emerald-500 text-xs font-bold pb-1 flex items-center">
-                        <i class="fas fa-arrow-up mr-1"></i> 12%
-                    </span>
-                </div>
-                <p class="text-xs text-slate-500 font-medium mt-3 italic">Today's system transactions</p>
+        <!-- Card 1: Inventory -->
+        <div class="premium-card p-8">
+            <div class="stat-icon bg-blue-50 text-blue-600">
+                <i class="fas fa-layer-group text-xl"></i>
             </div>
-            <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-blue-50/30 rounded-full blur-2xl"></div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Stock Assets</p>
+            <h3 class="text-3xl font-black text-slate-900 leading-none"><?php echo $total_meds; ?></h3>
+            <div class="mt-4 flex items-center text-[10px] font-bold">
+                <span class="text-emerald-500">+12% from last week</span>
+            </div>
+        </div>
+        
+        <!-- Card 2: Revenue -->
+        <div class="premium-card p-8 bg-slate-900 !border-slate-800">
+            <div class="stat-icon bg-white/10 text-white backdrop-blur">
+                <i class="fas fa-chart-line text-xl"></i>
+            </div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Today's Revenue</p>
+            <h3 class="text-3xl font-black text-white leading-none">Rs. <?php echo number_format($today_revenue, 2); ?></h3>
+            <div class="mt-4 flex items-center text-[10px] font-bold">
+                <span class="text-blue-400">Transaction pulse active</span>
+            </div>
         </div>
 
-        <!-- Card 2 -->
-        <div class="stat-card bg-slate-900 p-8 rounded-[2rem] shadow-2xl relative overflow-hidden">
-            <div class="relative z-10">
-                <div class="w-12 h-12 bg-white/10 text-white rounded-2xl flex items-center justify-center mb-6 backdrop-blur">
-                    <i class="fas fa-vault text-xl"></i>
-                </div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Financial Liquid</p>
-                <div class="flex items-end space-x-2">
-                    <h3 class="text-3xl font-black text-white leading-none">Rs. <?php echo number_format($today_revenue, 0); ?></h3>
-                </div>
-                <p class="text-xs text-slate-400 font-medium mt-4">Real-time revenue stream</p>
+        <!-- Card 3: Patients -->
+        <div class="premium-card p-8">
+            <div class="stat-icon bg-emerald-50 text-emerald-600">
+                <i class="fas fa-user-check text-xl"></i>
             </div>
-            <div class="absolute -top-12 -right-12 w-32 h-32 bg-blue-600/20 rounded-full blur-3xl"></div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Patient Base</p>
+            <h3 class="text-3xl font-black text-slate-900 leading-none"><?php echo $total_customers; ?></h3>
+            <div class="mt-4 flex items-center text-[10px] font-bold text-slate-400">
+                Across all regional branches
+            </div>
         </div>
 
-        <!-- Card 3 -->
-        <div class="stat-card bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40">
-            <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mb-6">
-                <i class="fas fa-microscope text-xl"></i>
+        <!-- Card 4: Alerts -->
+        <div class="premium-card p-8 bg-rose-50/30 !border-rose-100/50">
+            <div class="stat-icon bg-rose-50 text-rose-600">
+                <i class="fas fa-shield-virus text-xl"></i>
             </div>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Global Inventory</p>
-            <h3 class="text-4xl font-black text-slate-900 leading-none"><?php echo $total_meds; ?></h3>
-            <p class="text-xs text-slate-500 font-medium mt-3 italic">Active stock items</p>
-        </div>
-
-        <!-- Card 4 -->
-        <div class="stat-card bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 relative">
-            <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-6">
-                <i class="fas fa-biohazard text-xl"></i>
-            </div>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Critical Stock</p>
-            <h3 class="text-4xl font-black <?php echo ($low_stock > 0) ? 'text-rose-600' : 'text-slate-300'; ?> leading-none"><?php echo $low_stock; ?></h3>
-            <div class="mt-4 flex flex-wrap gap-2">
-                <span class="px-3 py-1 bg-rose-100 text-rose-700 text-[10px] font-black rounded-lg uppercase tracking-wider <?php echo ($low_stock > 0) ? 'alert-pulse' : 'hidden'; ?>">High Priority</span>
+            <p class="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-1">System Alerts</p>
+            <h3 class="text-3xl font-black text-rose-900 leading-none"><?php echo $low_stock; ?></h3>
+            <div class="mt-4 flex items-center text-[10px] font-bold text-rose-600">
+                <i class="fas fa-exclamation-triangle mr-1"></i> Critical stock warning
             </div>
         </div>
     </div>
 
-    <!-- Trends & Insights -->
+    <!-- Charts & Analytics Matrix -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-        <div class="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40">
+        <div class="lg:col-span-2 premium-card p-10">
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <h3 class="text-xl font-black text-slate-900 uppercase italic">Revenue Velocity</h3>
@@ -166,7 +159,7 @@ while($row = $monthly_sales->fetch_assoc()) {
             </div>
         </div>
 
-        <div class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40">
+        <div class="premium-card p-10">
             <h3 class="text-xl font-black text-slate-900 uppercase italic mb-8">Asset Ranking</h3>
             <div class="space-y-6">
                 <?php while($med = $top_meds->fetch_assoc()): ?>

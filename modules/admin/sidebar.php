@@ -57,11 +57,11 @@ $low_stock = $low_stock_result->fetch_assoc()['count'] ?? 0;
                     <div>
                         <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Intelligence</p>
                         <div class="space-y-1">
-                            <a href="<?php echo $path; ?>dashboard.php" class="nav-item flex items-center space-x-3 px-4 py-3 text-slate-600 <?php echo (basename($_SERVER['PHP_SELF']) == 'dashboard.php') ? 'sidebar-active' : ''; ?>">
+                            <a href="<?php echo $path; ?>dashboard.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'dashboard.php') ? 'nav-link-active' : ''; ?>">
                                 <i class="fas fa-home-alt text-lg"></i>
                                 <span class="font-semibold text-sm">Dashboard</span>
                             </a>
-                            <a href="<?php echo $path; ?>sales/pos_new.php" class="nav-item flex items-center space-x-3 px-4 py-3 text-slate-600">
+                            <a href="<?php echo $path; ?>sales/pos_new.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'pos_new.php') ? 'nav-link-active' : ''; ?>">
                                 <i class="fas fa-cash-register text-lg"></i>
                                 <span class="font-semibold text-sm">Point of Sale</span>
                             </a>
@@ -72,18 +72,18 @@ $low_stock = $low_stock_result->fetch_assoc()['count'] ?? 0;
                     <div>
                         <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Operations</p>
                         <div class="space-y-1">
-                            <a href="<?php echo $path; ?>inventory/view.php" class="nav-item flex items-center justify-between px-4 py-3 text-slate-600">
+                            <a href="<?php echo $path; ?>inventory/view.php" class="nav-link justify-between <?php echo (basename($_SERVER['PHP_SELF']) == 'view.php' && strpos($_SERVER['PHP_SELF'], 'inventory') !== false) ? 'nav-link-active' : ''; ?>">
                                 <span class="flex items-center space-x-3">
-                                    <i class="fas fa-boxes-stacked text-lg text-purple-600"></i>
-                                    <span class="font-semibold text-sm text-slate-700">Stock Inventory</span>
+                                    <i class="fas fa-boxes-stacked text-lg"></i>
+                                    <span class="font-semibold text-sm">Stock Inventory</span>
                                 </span>
                                 <?php if($low_stock > 0): ?>
-                                    <span class="bg-rose-100 text-rose-600 text-[10px] font-black px-2 py-0.5 rounded-full border border-rose-200 alert-pulse"><?php echo $low_stock; ?></span>
+                                    <span class="bg-rose-100 text-rose-600 text-[10px] font-black px-2 py-0.5 rounded-full border border-rose-200"><?php echo $low_stock; ?></span>
                                 <?php endif; ?>
                             </a>
-                            <a href="<?php echo $path; ?>purchases/view_new.php" class="nav-item flex items-center space-x-3 px-4 py-3 text-slate-600">
-                                <i class="fas fa-cart-flatbed text-lg text-indigo-500"></i>
-                                <span class="font-semibold text-sm text-slate-700">Procurement</span>
+                            <a href="<?php echo $path; ?>purchases/view_new.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'view_new.php' && strpos($_SERVER['PHP_SELF'], 'purchases') !== false) ? 'nav-link-active' : ''; ?>">
+                                <i class="fas fa-cart-flatbed text-lg"></i>
+                                <span class="font-semibold text-sm">Procurement</span>
                             </a>
                         </div>
                     </div>
@@ -92,20 +92,20 @@ $low_stock = $low_stock_result->fetch_assoc()['count'] ?? 0;
                     <div>
                         <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Core Directory</p>
                         <div class="space-y-1">
-                            <a href="<?php echo $path; ?>customers/view_new.php" class="nav-item flex items-center justify-between px-4 py-3 text-slate-600">
+                            <a href="<?php echo $path; ?>customers/view_new.php" class="nav-link justify-between <?php echo (strpos($_SERVER['PHP_SELF'], 'customers') !== false) ? 'nav-link-active' : ''; ?>">
                                 <span class="flex items-center space-x-3">
-                                    <i class="fas fa-fingerprint text-lg text-emerald-500"></i>
-                                    <span class="font-semibold text-sm text-slate-700">Patient Database</span>
+                                    <i class="fas fa-fingerprint text-lg"></i>
+                                    <span class="font-semibold text-sm">Patient Database</span>
                                 </span>
-                                <span class="text-[10px] font-black text-slate-400"><?php echo $total_customers; ?></span>
+                                <span class="text-[10px] font-black opacity-50"><?php echo $total_customers; ?></span>
                             </a>
-                            <a href="<?php echo $path; ?>suppliers/view_new.php" class="nav-item flex items-center space-x-3 px-4 py-3 text-slate-600">
-                                <i class="fas fa-handshake-angle text-lg text-amber-500"></i>
-                                <span class="font-semibold text-sm text-slate-700">Partner Network</span>
+                            <a href="<?php echo $path; ?>suppliers/view_new.php" class="nav-link <?php echo (strpos($_SERVER['PHP_SELF'], 'suppliers') !== false) ? 'nav-link-active' : ''; ?>">
+                                <i class="fas fa-handshake-angle text-lg"></i>
+                                <span class="font-semibold text-sm">Partner Network</span>
                             </a>
-                            <a href="<?php echo $path; ?>employees/view_new.php" class="nav-item flex items-center space-x-3 px-4 py-3 text-slate-600">
-                                <i class="fas fa-id-badge text-lg text-blue-500"></i>
-                                <span class="font-semibold text-sm text-slate-700">Staff Management</span>
+                            <a href="<?php echo $path; ?>employees/view_new.php" class="nav-link <?php echo (strpos($_SERVER['PHP_SELF'], 'employees') !== false) ? 'nav-link-active' : ''; ?>">
+                                <i class="fas fa-id-badge text-lg"></i>
+                                <span class="font-semibold text-sm">Staff Management</span>
                             </a>
                         </div>
                     </div>
@@ -114,15 +114,13 @@ $low_stock = $low_stock_result->fetch_assoc()['count'] ?? 0;
                     <div>
                         <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Analysis</p>
                         <div class="space-y-1">
-                            <a href="<?php echo $path; ?>reports/reports_dashboard.php" class="nav-item flex items-center space-x-3 px-4 py-3 text-slate-600">
-                                <i class="fas fa-chart-line text-lg text-rose-500"></i>
-                                <span class="font-semibold text-sm text-slate-700">Visual Insights</span>
+                            <a href="<?php echo $path; ?>reports/reports_dashboard.php" class="nav-link <?php echo (strpos($_SERVER['PHP_SELF'], 'reports') !== false) ? 'nav-link-active' : ''; ?>">
+                                <i class="fas fa-chart-line text-lg"></i>
+                                <span class="font-semibold text-sm">Visual Insights</span>
                             </a>
-                            <a href="<?php echo $path; ?>alerts/alerts.php" class="nav-item flex items-center justify-between px-4 py-3 text-slate-600">
-                                <span class="flex items-center space-x-3">
-                                    <i class="fas fa-shield-virus text-lg text-orange-500"></i>
-                                    <span class="font-semibold text-sm text-slate-700">Security Alerts</span>
-                                </span>
+                            <a href="<?php echo $path; ?>alerts/alerts.php" class="nav-link <?php echo (strpos($_SERVER['PHP_SELF'], 'alerts') !== false) ? 'nav-link-active' : ''; ?>">
+                                <i class="fas fa-shield-virus text-lg"></i>
+                                <span class="font-semibold text-sm">Security Alerts</span>
                             </a>
                         </div>
                     </div>
