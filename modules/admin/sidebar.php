@@ -23,54 +23,14 @@ $low_stock = $low_stock_result->fetch_assoc()['count'] ?? 0;
 
 <!-- Tailwind CSS & Google Fonts -->
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/design-system.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<style>
-    body { font-family: 'Outfit', sans-serif; }
-    
-    .glass-effect {
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+<style type="text/tailwindcss">
+    @layer components {
+        .nav-link { @apply flex items-center space-x-3 px-5 py-3.5 rounded-2xl text-slate-500 font-semibold transition-all duration-300 hover:bg-blue-50/50 hover:text-blue-600 hover:translate-x-1; }
+        .nav-link-active { @apply bg-blue-600 text-white shadow-lg shadow-blue-200; }
     }
-    
-    .sidebar-active {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-        color: white !important;
-    }
-    
-    .nav-item {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border-radius: 12px;
-        margin-bottom: 4px;
-    }
-    
-    .nav-item:hover:not(.sidebar-active) {
-        background: rgba(59, 130, 246, 0.05);
-        transform: translateX(4px);
-    }
-    
-    .nav-item i { transition: transform 0.3s ease; }
-    .nav-item:hover i { transform: scale(1.1); }
-
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #e2e8f0;
-        border-radius: 10px;
-    }
-    
-    @keyframes slow-pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.7; transform: scale(1.05); }
-    }
-    .alert-pulse { animation: slow-pulse 2s infinite; }
 </style>
 
 <div class="flex h-screen bg-[#f8fafc] overflow-hidden">
