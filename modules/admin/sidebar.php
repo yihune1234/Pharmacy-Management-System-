@@ -101,7 +101,7 @@ $low_stock = $low_stock_result->fetch_assoc()['count'] ?? 0;
                                 <i class="fas fa-home-alt text-lg"></i>
                                 <span class="font-semibold text-sm">Dashboard</span>
                             </a>
-                            <a href="<?php echo $path; ?>sales/pos1.php" class="nav-item flex items-center space-x-3 px-4 py-3 text-slate-600">
+                            <a href="<?php echo $path; ?>sales/pos_new.php" class="nav-item flex items-center space-x-3 px-4 py-3 text-slate-600">
                                 <i class="fas fa-cash-register text-lg"></i>
                                 <span class="font-semibold text-sm">Point of Sale</span>
                             </a>
