@@ -87,16 +87,30 @@ function require_admin() {
 
 /**
  * Validate pharmacist access
+ * Allows both Pharmacists and Admins
  */
 function require_pharmacist() {
-    require_role('pharmacist');
+    require_auth();
+    $role = get_user_role();
+    if (!in_array($role, ['pharmacist', 'admin'])) {
+        set_flash_message("Access denied. Pharmacist area restricted.", "error");
+        header("Location: ../auth/login.php");
+        exit();
+    }
 }
 
 /**
  * Validate cashier access
+ * Allows Cashiers, Pharmacists, and Admins
  */
 function require_cashier() {
-    require_role('cashier');
+    require_auth();
+    $role = get_user_role();
+    if (!in_array($role, ['cashier', 'pharmacist', 'admin'])) {
+        set_flash_message("Access denied. Cashier area restricted.", "error");
+        header("Location: ../auth/login.php");
+        exit();
+    }
 }
 
 /**
