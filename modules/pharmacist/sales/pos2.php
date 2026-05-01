@@ -20,28 +20,28 @@ if (!$sid) {
 
 // Calculate Total if it's the final step
 if (isset($_POST['custadd'])) {
-    $res = $conn->query("SELECT SUM(tot_price) AS TOTAL FROM sales_items WHERE sale_id='$sid'");
+    $res = $conn->query("SELECT SUM(Tot_Price) AS TOTAL FROM sales_items WHERE Sale_ID='$sid'");
     $row = $res->fetch_assoc();
     $tot = $row['TOTAL'] ?? 0;
     
-    $conn->query("UPDATE sales SET total_amt='$tot' WHERE sale_id='$sid'");
+    $conn->query("UPDATE sales SET Total_Amt='$tot' WHERE Sale_ID='$sid'");
     set_flash_message("✅ Transaction processed successfully!", "success");
 }
 
 // Fetch Order & Customer Details
 $order_query = "SELECT s.*, c.C_Fname, c.C_Lname, c.C_Phno, e.E_Fname 
                 FROM sales s 
-                JOIN customer c ON s.c_id = c.C_ID 
-                JOIN employee e ON s.e_id = e.E_ID 
-                WHERE s.sale_id = '$sid'";
+                JOIN customer c ON s.C_ID = c.C_ID 
+                JOIN employee e ON s.E_ID = e.E_ID 
+                WHERE s.Sale_ID = '$sid'";
 $order_res = $conn->query($order_query);
 $order = $order_res->fetch_assoc();
 
 // Fetch Items
 $items_res = $conn->query("SELECT si.*, m.Med_Name, m.Med_Price 
                            FROM sales_items si 
-                           JOIN meds m ON si.med_id = m.Med_ID 
-                           WHERE si.sale_id = '$sid'");
+                           JOIN meds m ON si.Med_ID = m.Med_ID 
+                           WHERE si.Sale_ID = '$sid'");
 
 ?>
 
@@ -132,9 +132,9 @@ $items_res = $conn->query("SELECT si.*, m.Med_Name, m.Med_Price
                     <?php if ($items_res): while($item = $items_res->fetch_assoc()): ?>
                     <tr>
                         <td class="py-6 font-bold text-slate-900"><?php echo htmlspecialchars($item['Med_Name']); ?></td>
-                        <td class="py-6 text-center text-slate-600 font-bold"><?php echo $item['sale_qty']; ?></td>
+                        <td class="py-6 text-center text-slate-600 font-bold"><?php echo $item['Sale_Qty']; ?></td>
                         <td class="py-6 text-right text-slate-500 font-medium">Rs. <?php echo number_format($item['Med_Price'], 2); ?></td>
-                        <td class="py-6 text-right font-black text-slate-900">Rs. <?php echo number_format($item['tot_price'], 2); ?></td>
+                        <td class="py-6 text-right font-black text-slate-900">Rs. <?php echo number_format($item['Tot_Price'], 2); ?></td>
                     </tr>
                     <?php endwhile; endif; ?>
                 </tbody>
@@ -145,7 +145,7 @@ $items_res = $conn->query("SELECT si.*, m.Med_Name, m.Med_Price
                 <div class="w-full md:w-64 space-y-4">
                     <div class="flex justify-between text-slate-500 font-medium">
                         <span>Subtotal</span>
-                        <span>Rs. <?php echo number_format($order['total_amt'] ?? 0, 2); ?></span>
+                        <span>Rs. <?php echo number_format($order['Total_Amt'] ?? 0, 2); ?></span>
                     </div>
                     <div class="flex justify-between text-slate-500 font-medium">
                         <span>Tax (0%)</span>
@@ -153,7 +153,7 @@ $items_res = $conn->query("SELECT si.*, m.Med_Name, m.Med_Price
                     </div>
                     <div class="flex justify-between items-center py-4 px-6 bg-slate-900 rounded-2xl mt-4">
                         <span class="text-white font-bold uppercase tracking-widest text-xs">Total Amount</span>
-                        <span class="text-emerald-400 font-black text-xl">Rs. <?php echo number_format($order['total_amt'] ?? 0, 2); ?></span>
+                        <span class="text-emerald-400 font-black text-xl">Rs. <?php echo number_format($order['Total_Amt'] ?? 0, 2); ?></span>
                     </div>
                 </div>
             </div>
