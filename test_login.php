@@ -36,7 +36,7 @@ foreach ($test_data as $data) {
     
     // Check if exists
     $check = $conn->query("SELECT E_ID FROM employee WHERE E_Username = '$username'");
-    if ($check->num_rows > 0) {
+    if ($check && $check->num_rows > 0) {
         echo "⊘ $username already exists\n";
         $skipped++;
         continue;
@@ -50,7 +50,8 @@ foreach ($test_data as $data) {
     $role_id = $roles[$role_name];
     $hashed = password_hash($password, PASSWORD_DEFAULT);
     
-    $sql = "INSERT INTO employee (E_Username, E_Password, E_Fname, E_Lname, E_Email, role_id) VALUES ('$username', '$hashed', '$fname', '$lname', '$email', $role_id)";
+    // Use E_Mail not E_Email
+    $sql = "INSERT INTO employee (E_Username, E_Password, E_Fname, E_Lname, E_Mail, role_id) VALUES ('$username', '$hashed', '$fname', '$lname', '$email', $role_id)";
     
     if ($conn->query($sql)) {
         echo "✓ Created: $username\n";
@@ -67,7 +68,7 @@ echo "Skipped: $skipped\n";
 // Verify
 echo "\n=== VERIFICATION ===\n";
 $verify = $conn->query("SELECT E_Username, E_Fname, role_id FROM employee WHERE E_Username IN ('admin', 'pharmacist', 'cashier')");
-if ($verify->num_rows > 0) {
+if ($verify && $verify->num_rows > 0) {
     while ($row = $verify->fetch_assoc()) {
         echo "✓ {$row['E_Username']} - {$row['E_Fname']} (Role ID: {$row['role_id']})\n";
     }
