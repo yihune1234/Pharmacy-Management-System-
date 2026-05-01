@@ -8,61 +8,71 @@ $login_attempted = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login_attempted = true;
-    $username = htmlspecialchars($_POST['username'] ?? '');
+    $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    if ($username && $password) {
+    if (!empty($username) && !empty($password)) {
         try {
             // Query database for user with role information
-            $stmt = $conn->prepare("
+            $query = "
                 SELECT e.E_ID, e.E_Fname, e.E_Username, e.E_Password, e.role_id, r.role_name 
                 FROM employee e 
                 LEFT JOIN roles r ON e.role_id = r.role_id 
                 WHERE e.E_Username = ?
-            ");
+            ";
+            
+            $stmt = $conn->prepare($query);
             
             if (!$stmt) {
                 $error = 'Database error: ' . $conn->error;
             } else {
                 $stmt->bind_param("s", $username);
-                $stmt->execute();
-                $result = $stmt->get_result();
+                
+                if (!$stmt->execute()) {
+                    $error = 'Database query failed: ' . $stmt->error;
+                } else {
+                    $result = $stmt->get_result();
 
-                if ($result->num_rows > 0) {
-                    $user = $result->fetch_assoc();
-                    
-                    // Verify password
-                    if (password_verify($password, $user['E_Password'])) {
-                        // Create session
-                        $_SESSION['user'] = $user['E_ID'];
-                        $_SESSION['username'] = $user['E_Username'];
-                        $_SESSION['name'] = $user['E_Fname'];
-                        $_SESSION['role'] = $user['role_name'] ?? 'admin';
-                        $_SESSION['role_id'] = $user['role_id'];
-                        $_SESSION['last_activity'] = time();
-
-                        // Redirect based on role
-                        $role = strtolower($user['role_name'] ?? 'admin');
+                    if ($result && $result->num_rows > 0) {
+                        $user = $result->fetch_assoc();
                         
-                        if ($role === 'admin') {
-                            header("Location: ../modules/admin/dashboard.php");
-                            exit();
-                        } elseif ($role === 'pharmacist') {
-                            header("Location: ../modules/pharmacist/dashboard.php");
-                            exit();
-                        } elseif ($role === 'cashier') {
-                            header("Location: ../modules/cashier/dashboard.php");
+                        // Verify password
+                        if (password_verify($password, $user['E_Password'])) {
+                            // Create session
+                            $_SESSION['user'] = $user['E_ID'];
+                            $_SESSION['username'] = $user['E_Username'];
+                            $_SESSION['name'] = $user['E_Fname'];
+                            $_SESSION['role'] = $user['role_name'] ?? 'admin';
+                            $_SESSION['role_id'] = $user['role_id'];
+                            $_SESSION['last_activity'] = time();
+
+                            // Determine redirect URL based on role
+                            $role = strtolower(trim($user['role_name'] ?? 'admin'));
+                            $redirect_url = '';
+                            
+                            switch ($role) {
+                                case 'admin':
+                                    $redirect_url = '../modules/admin/dashboard.php';
+                                    break;
+                                case 'pharmacist':
+                                    $redirect_url = '../modules/pharmacist/dashboard.php';
+                                    break;
+                                case 'cashier':
+                                    $redirect_url = '../modules/cashier/dashboard.php';
+                                    break;
+                                default:
+                                    $redirect_url = '../modules/admin/dashboard.php';
+                            }
+                            
+                            // Perform redirect
+                            header('Location: ' . $redirect_url);
                             exit();
                         } else {
-                            // Default to admin if role is unknown
-                            header("Location: ../modules/admin/dashboard.php");
-                            exit();
+                            $error = 'Invalid username or password.';
                         }
                     } else {
                         $error = 'Invalid username or password.';
                     }
-                } else {
-                    $error = 'Invalid username or password.';
                 }
                 $stmt->close();
             }
