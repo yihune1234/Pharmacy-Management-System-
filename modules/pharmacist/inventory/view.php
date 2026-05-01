@@ -9,11 +9,11 @@ if (!isset($conn) || !($conn instanceof mysqli) || ($conn instanceof mysqli && $
 }
 
 $search = $_POST['valuetosearch'] ?? '';
-$query = "SELECT med_id as medid, med_name as medname, med_qty as medqty, category as medcategory, med_price as medprice, location_rack as medlocation FROM meds";
+$query = "SELECT Med_ID as medid, Med_Name as medname, Med_Qty as medqty, Category as medcategory, Med_Price as medprice, Location_Rack as medlocation FROM meds";
 
 if (!empty($search)) {
     $search = $conn->real_escape_string($search);
-    $query .= " WHERE med_name LIKE '%$search%' OR med_id LIKE '%$search%'";
+    $query .= " WHERE Med_Name LIKE '%$search%' OR Med_ID LIKE '%$search%'";
 }
 
 $search_result = $conn->query($query);
