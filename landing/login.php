@@ -52,16 +52,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             
                             switch ($role) {
                                 case 'admin':
-                                    $redirect_url = '../modules/admin/dashboard.php';
+                                    $redirect_url = '/Pharmacy-Management-System-/modules/admin/dashboard.php';
                                     break;
                                 case 'pharmacist':
-                                    $redirect_url = '../modules/pharmacist/dashboard.php';
+                                    $redirect_url = '/Pharmacy-Management-System-/modules/pharmacist/dashboard.php';
                                     break;
                                 case 'cashier':
-                                    $redirect_url = '../modules/cashier/dashboard.php';
+                                    $redirect_url = '/Pharmacy-Management-System-/modules/cashier/dashboard.php';
                                     break;
                                 default:
-                                    $redirect_url = '../modules/admin/dashboard.php';
+                                    $redirect_url = '/Pharmacy-Management-System-/modules/admin/dashboard.php';
                             }
                             
                             // Perform redirect
