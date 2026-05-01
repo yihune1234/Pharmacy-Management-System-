@@ -19,7 +19,7 @@ $meds_stats = $conn->query("
 $expired_stats = $conn->query("
     SELECT COUNT(DISTINCT Med_ID) as expired_count 
     FROM purchase 
-    WHERE exp_date <= CURDATE()
+    WHERE Exp_Date <= CURDATE()
 ")->fetch_assoc();
 
 $inventory_status = [
@@ -30,12 +30,12 @@ $inventory_status = [
 
 // 3. Expiry Alerts (Join meds and purchase)
 $expiry_alerts = $conn->query("
-    SELECT m.Med_Name, p.exp_date as Exp_Date, m.Med_Qty, m.Location_Rack
+    SELECT m.Med_Name, p.Exp_Date, m.Med_Qty, m.Location_Rack
     FROM meds m
     JOIN purchase p ON m.Med_ID = p.Med_ID
-    WHERE p.exp_date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
-    GROUP BY m.Med_ID, m.Med_Name, p.exp_date, m.Med_Qty, m.Location_Rack
-    ORDER BY p.exp_date ASC
+    WHERE p.Exp_Date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+    GROUP BY m.Med_ID, m.Med_Name, p.Exp_Date, m.Med_Qty, m.Location_Rack
+    ORDER BY p.Exp_Date ASC
     LIMIT 5
 ");
 
@@ -53,147 +53,523 @@ $low_stock_alerts = $conn->query("
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligence Console - PHARMACIA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Reports Dashboard - PHARMACIA</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .content {
+            flex: 1;
+            margin-left: 288px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            height: 80px;
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+        
+        .main {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+        
+        .page-header {
+            margin-bottom: 40px;
+        }
+        
+        .page-header h2 {
+            font-size: 10px;
+            font-weight: 900;
+            color: #e11d48;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .page-header h1 {
+            font-size: 36px;
+            font-weight: 900;
+            color: #1e293b;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .page-header p {
+            color: #64748b;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-secondary {
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .btn-primary {
+            background-color: #1e293b;
+            color: white;
+            box-shadow: 0 20px 25px -5px rgba(30, 41, 59, 0.2);
+        }
+        
+        .btn-primary:hover {
+            background-color: #0f172a;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+        
+        .metric-card {
+            background-color: white;
+            padding: 32px;
+            border-radius: 32px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
+        }
+        
+        .metric-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 20px;
+        }
+        
+        .metric-icon.emerald {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        
+        .metric-icon.rose {
+            background-color: rgba(244, 63, 94, 0.1);
+            color: #f43f5e;
+        }
+        
+        .metric-icon.amber {
+            background-color: rgba(251, 146, 60, 0.1);
+            color: #fb923c;
+        }
+        
+        .metric-icon.indigo {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+        }
+        
+        .metric-label {
+            font-size: 10px;
+            font-weight: 900;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .metric-value {
+            font-size: 32px;
+            font-weight: 900;
+            color: #1e293b;
+            line-height: 1;
+        }
+        
+        .metric-value.rose {
+            color: #f43f5e;
+        }
+        
+        .metric-value.amber {
+            color: #fb923c;
+        }
+        
+        .metric-value.indigo {
+            color: #6366f1;
+        }
+        
+        .alerts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+        
+        .alert-card {
+            background-color: white;
+            padding: 40px;
+            border-radius: 48px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
+        }
+        
+        .alert-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+        
+        .alert-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: #1e293b;
+            text-transform: uppercase;
+            font-style: italic;
+        }
+        
+        .alert-badge {
+            padding: 6px 12px;
+            background-color: rgba(244, 63, 94, 0.1);
+            color: #f43f5e;
+            font-size: 9px;
+            font-weight: 900;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .alert-badge.amber {
+            background-color: rgba(251, 146, 60, 0.1);
+            color: #fb923c;
+        }
+        
+        .alert-items {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .alert-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background-color: rgba(248, 250, 252, 0.5);
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .alert-item:hover {
+            border-color: rgba(244, 63, 94, 0.2);
+        }
+        
+        .alert-item-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .alert-indicator {
+            width: 6px;
+            height: 32px;
+            background-color: #f43f5e;
+            border-radius: 9999px;
+        }
+        
+        .alert-item-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .alert-item-name {
+            font-size: 14px;
+            font-weight: 900;
+            color: #1e293b;
+        }
+        
+        .alert-item-location {
+            font-size: 10px;
+            font-weight: 700;
+            color: #cbd5e1;
+            text-transform: uppercase;
+        }
+        
+        .alert-item-value {
+            font-size: 14px;
+            font-weight: 900;
+            color: #f43f5e;
+        }
+        
+        .alert-item-value.amber {
+            color: #fb923c;
+        }
+        
+        .empty-state {
+            color: #cbd5e1;
+            font-weight: 700;
+            font-style: italic;
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+        
+        .nav-card {
+            background-color: white;
+            padding: 32px;
+            border-radius: 40px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .nav-card:hover {
+            transform: translateY(-8px);
+        }
+        
+        .nav-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-card:hover .nav-icon {
+            transform: scale(1.1);
+        }
+        
+        .nav-icon.blue {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+        
+        .nav-icon.purple {
+            background-color: rgba(147, 51, 234, 0.1);
+            color: #9333ea;
+        }
+        
+        .nav-icon.emerald {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        
+        .nav-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .nav-desc {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+    </style>
 </head>
-<body class="bg-[#f8fafc]">
-    <?php require('../sidebar.php'); ?>
-
-    <main class="flex-1 overflow-auto">
-        <div class="p-8">
-            <!-- Header Section -->
-            <div class="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div>
-            <h2 class="text-xs font-black text-rose-600 uppercase tracking-widest mb-1">Visual Analysis</h2>
-            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Reports Dashboard</h1>
-            <p class="text-slate-500 font-medium mt-1">Cross-sectional business intelligence and performance matrix.</p>
-        </div>
-        <div class="flex items-center space-x-3">
-            <button class="bg-white border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold text-slate-600 shadow-sm hover:bg-slate-50 transition-all flex items-center">
-                <i class="fas fa-file-pdf mr-2 text-rose-500"></i> Export PDF
-            </button>
-            <button class="bg-slate-900 text-white px-8 py-3.5 rounded-2xl text-sm font-black shadow-xl shadow-slate-200 hover:bg-slate-800 transition-all flex items-center group">
-                <i class="fas fa-file-excel mr-3 text-emerald-400"></i> Export Matrix
-            </button>
-        </div>
-        </div>
-    </div>
-
-    <!-- Core Metrics -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-        <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40">
-            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
-                <i class="fas fa-sack-dollar text-xl"></i>
-            </div>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Assets Vol.</p>
-            <h3 class="text-3xl font-black text-slate-900 leading-none"><?php echo $inventory_status['total_medicines']; ?></h3>
-        </div>
-        <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40">
-            <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-6">
-                <i class="fas fa-triangle-exclamation text-xl"></i>
-            </div>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Critical Stock</p>
-            <h3 class="text-3xl font-black text-rose-600 leading-none"><?php echo $inventory_status['low_stock_count']; ?></h3>
-        </div>
-        <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40">
-            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mb-6">
-                <i class="fas fa-calendar-xmark text-xl"></i>
-            </div>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Expired Batch</p>
-            <h3 class="text-3xl font-black text-amber-600 leading-none"><?php echo $inventory_status['expired_count']; ?></h3>
-        </div>
-        <div class="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40">
-            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-6">
-                <i class="fas fa-chart-line text-xl"></i>
-            </div>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Avg Efficiency</p>
-            <h3 class="text-3xl font-black text-indigo-600 leading-none">94.2%</h3>
-        </div>
-    </div>
-
-    <!-- Alert Console -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-        <div class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40">
-            <div class="flex items-center justify-between mb-8">
-                <h3 class="text-xl font-black text-slate-900 uppercase italic">Stock Depletion Alerts</h3>
-                <span class="px-3 py-1 bg-rose-100 text-rose-600 text-[9px] font-black rounded-lg uppercase tracking-widest">High Priority</span>
-            </div>
-            <div class="space-y-4">
-                <?php if ($low_stock_alerts && $low_stock_alerts->num_rows > 0): ?>
-                    <?php while($item = $low_stock_alerts->fetch_assoc()): ?>
-                        <div class="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl border border-slate-100 group hover:border-rose-200 transition-all">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-1.5 h-8 bg-rose-500 rounded-full"></div>
-                                <div class="flex flex-col">
-                                    <span class="text-sm font-black text-slate-900"><?php echo htmlspecialchars($item['Med_Name']); ?></span>
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase"><?php echo htmlspecialchars($item['Location_Rack']); ?></span>
-                                </div>
-                            </div>
-                            <span class="text-sm font-black text-rose-600"><?php echo $item['Med_Qty']; ?> Left</span>
+<body>
+    <div class="container">
+        <?php require('../sidebar.php'); ?>
+        
+        <div class="content">
+            <header class="header">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div>
+                        <h2 style="font-size: 10px; font-weight: 900; color: #cbd5e1; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 4px 0;">Application</h2>
+                        <h1 style="font-size: 18px; font-weight: 700; color: #1e293b; letter-spacing: -0.5px; margin: 0; line-height: 1;">Reports Dashboard</h1>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-file-pdf" style="color: #e11d48;"></i> Export PDF
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-file-excel" style="color: #10b981;"></i> Export Matrix
+                    </button>
+                </div>
+            </header>
+            
+            <main class="main">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h2>Visual Analysis</h2>
+                    <h1>Reports Dashboard</h1>
+                    <p>Cross-sectional business intelligence and performance matrix.</p>
+                </div>
+                
+                <!-- Core Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon emerald">
+                            <i class="fas fa-sack-dollar"></i>
                         </div>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <p class="text-slate-400 font-bold italic py-10 text-center">No critical stock levels detected.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <div class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/40">
-            <div class="flex items-center justify-between mb-8">
-                <h3 class="text-xl font-black text-slate-900 uppercase italic">Expiry Watchdog</h3>
-                <span class="px-3 py-1 bg-amber-100 text-amber-600 text-[9px] font-black rounded-lg uppercase tracking-widest">Schedule Log</span>
-            </div>
-            <div class="space-y-4">
-                <?php if ($expiry_alerts && $expiry_alerts->num_rows > 0): ?>
-                    <?php while($item = $expiry_alerts->fetch_assoc()): ?>
-                        <div class="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl border border-slate-100 group hover:border-amber-200 transition-all">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-1.5 h-8 bg-amber-500 rounded-full"></div>
-                                <div class="flex flex-col">
-                                    <span class="text-sm font-black text-slate-900"><?php echo htmlspecialchars($item['Med_Name']); ?></span>
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase"><?php echo date('M Y', strtotime($item['Exp_Date'])); ?> Status</span>
-                                </div>
-                            </div>
-                            <span class="text-[10px] font-black text-amber-600 tracking-widest uppercase">Approaching</span>
+                        <div class="metric-label">Total Assets Vol.</div>
+                        <div class="metric-value"><?php echo $inventory_status['total_medicines']; ?></div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon rose">
+                            <i class="fas fa-triangle-exclamation"></i>
                         </div>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <p class="text-slate-400 font-bold italic py-10 text-center">No expiry risks synchronized.</p>
-                <?php endif; ?>
-            </div>
+                        <div class="metric-label">Critical Stock</div>
+                        <div class="metric-value rose"><?php echo $inventory_status['low_stock_count']; ?></div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon amber">
+                            <i class="fas fa-calendar-xmark"></i>
+                        </div>
+                        <div class="metric-label">Expired Batch</div>
+                        <div class="metric-value amber"><?php echo $inventory_status['expired_count']; ?></div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon indigo">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="metric-label">Avg Efficiency</div>
+                        <div class="metric-value indigo">94.2%</div>
+                    </div>
+                </div>
+                
+                <!-- Alert Console -->
+                <div class="alerts-grid">
+                    <div class="alert-card">
+                        <div class="alert-header">
+                            <h3 class="alert-title">Stock Depletion Alerts</h3>
+                            <span class="alert-badge">High Priority</span>
+                        </div>
+                        <div class="alert-items">
+                            <?php if ($low_stock_alerts && $low_stock_alerts->num_rows > 0): ?>
+                                <?php while($item = $low_stock_alerts->fetch_assoc()): ?>
+                                    <div class="alert-item">
+                                        <div class="alert-item-left">
+                                            <div class="alert-indicator"></div>
+                                            <div class="alert-item-info">
+                                                <div class="alert-item-name"><?php echo htmlspecialchars($item['Med_Name']); ?></div>
+                                                <div class="alert-item-location"><?php echo htmlspecialchars($item['Location_Rack']); ?></div>
+                                            </div>
+                                        </div>
+                                        <div class="alert-item-value"><?php echo $item['Med_Qty']; ?> Left</div>
+                                    </div>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <div class="empty-state">No critical stock levels detected.</div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    
+                    <div class="alert-card">
+                        <div class="alert-header">
+                            <h3 class="alert-title">Expiry Watchdog</h3>
+                            <span class="alert-badge amber">Schedule Log</span>
+                        </div>
+                        <div class="alert-items">
+                            <?php if ($expiry_alerts && $expiry_alerts->num_rows > 0): ?>
+                                <?php while($item = $expiry_alerts->fetch_assoc()): ?>
+                                    <div class="alert-item">
+                                        <div class="alert-item-left">
+                                            <div class="alert-indicator" style="background-color: #fb923c;"></div>
+                                            <div class="alert-item-info">
+                                                <div class="alert-item-name"><?php echo htmlspecialchars($item['Med_Name']); ?></div>
+                                                <div class="alert-item-location"><?php echo date('M Y', strtotime($item['Exp_Date'])); ?> Status</div>
+                                            </div>
+                                        </div>
+                                        <div class="alert-item-value amber">Approaching</div>
+                                    </div>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <div class="empty-state">No expiry risks synchronized.</div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Navigation Matrix -->
+                <div class="nav-grid">
+                    <a href="sales_report.php" class="nav-card">
+                        <div class="nav-icon blue">
+                            <i class="fas fa-chart-simple"></i>
+                        </div>
+                        <h4 class="nav-title">Sales Analytics</h4>
+                        <p class="nav-desc">Deep dive into transactional high-frequency data logs.</p>
+                    </a>
+                    
+                    <a href="stock_report.php" class="nav-card">
+                        <div class="nav-icon purple">
+                            <i class="fas fa-boxes-packing"></i>
+                        </div>
+                        <h4 class="nav-title">Stock Fidelity</h4>
+                        <p class="nav-desc">Verify asset counts and storage location precision matrix.</p>
+                    </a>
+                    
+                    <a href="../employees/view_new.php" class="nav-card">
+                        <div class="nav-icon emerald">
+                            <i class="fas fa-user-gear"></i>
+                        </div>
+                        <h4 class="nav-title">Force Dynamics</h4>
+                        <p class="nav-desc">Analyze personnel contribution and operational efficiency ratio.</p>
+                    </a>
+                </div>
+            </main>
         </div>
-    </div>
-
-    <!-- Quick Navigation Matrix -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-        <a href="sales_report.php" class="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all">
-            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-all">
-                <i class="fas fa-chart-simple text-xl"></i>
-            </div>
-            <h4 class="text-lg font-black text-slate-900 uppercase tracking-tight mb-2">Sales Analytics</h4>
-            <p class="text-xs text-slate-500 font-medium">Deep dive into transactional high-frequency data logs.</p>
-        </a>
-        <a href="stock_report.php" class="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all">
-            <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-all">
-                <i class="fas fa-boxes-packing text-xl"></i>
-            </div>
-            <h4 class="text-lg font-black text-slate-900 uppercase tracking-tight mb-2">Stock Fidelity</h4>
-            <p class="text-xs text-slate-500 font-medium">Verify asset counts and storage location precision matrix.</p>
-        </a>
-        <a href="../employees/view_new.php" class="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all">
-            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-all">
-                <i class="fas fa-user-gear text-xl"></i>
-            </div>
-            <h4 class="text-lg font-black text-slate-900 uppercase tracking-tight mb-2">Force Dynamics</h4>
-            <p class="text-xs text-slate-500 font-medium">Analyze personnel contribution and operational efficiency ratio.</p>
-        </a>
-    </div>
-
-    <!-- Closing Sidebar Tags -->
-        </div>
-    </main>
-    </div>
     </div>
 </body>
 </html>
