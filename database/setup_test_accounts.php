@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['setup_accounts'])) {
             
             // Insert account
             $insert_stmt = $conn->prepare("
-                INSERT INTO employee (E_Username, E_Password, E_Fname, E_Lname, E_Email, role_id)
+                INSERT INTO employee (E_Username, E_Password, E_Fname, E_Lname, E_Mail, role_id)
                 VALUES (?, ?, ?, ?, ?, ?)
             ");
             
