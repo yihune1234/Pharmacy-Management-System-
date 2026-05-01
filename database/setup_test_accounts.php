@@ -11,7 +11,7 @@ $message_type = '';
 $accounts_added = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['setup_accounts'])) {
-    // Test accounts to add
+    // Test accounts to add - using correct role names from database
     $test_accounts = [
         [
             'username' => 'admin',
@@ -40,13 +40,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['setup_accounts'])) {
     ];
 
     try {
-        // Get role IDs
+        // Get role IDs - normalize role names for matching
         $roles = [];
         $role_result = $conn->query("SELECT role_id, role_name FROM roles");
         
         if ($role_result) {
             while ($row = $role_result->fetch_assoc()) {
+                // Store both original and lowercase versions for flexible matching
                 $roles[$row['role_name']] = $row['role_id'];
+                $roles[strtolower($row['role_name'])] = $row['role_id'];
             }
         }
         
