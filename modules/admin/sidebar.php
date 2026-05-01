@@ -21,6 +21,10 @@ $low_stock_result = $conn->query("SELECT COUNT(*) as count FROM meds WHERE Med_Q
 $low_stock = $low_stock_result->fetch_assoc()['count'] ?? 0;
 ?>
 
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
     .glass-effect {
         background: rgba(255, 255, 255, 0.7);
