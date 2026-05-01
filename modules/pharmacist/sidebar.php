@@ -79,22 +79,13 @@ validate_role_area('pharmacist');
                 </div>
             </nav>
 
-            <!-- User Status Card -->
             <div class="p-6 border-t border-slate-900 bg-slate-950/50">
-                <?php
-                include $path . "../../config/config.php";
-                if (session_status() == PHP_SESSION_NONE) { session_start(); }
-                $sql="SELECT E_FNAME from EMPLOYEE WHERE E_ID='$_SESSION[user]'";
-                $result=$conn->query($sql);
-                $row=$result->fetch_row();
-                $ename=$row[0];
-                ?>
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center font-bold border border-emerald-500/20">
-                        <?php echo strtoupper(substr($ename, 0, 1)); ?>
+                        <?php echo strtoupper(substr($_SESSION['name'] ?? 'P', 0, 1)); ?>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs font-bold text-white truncate"><?php echo htmlspecialchars($ename); ?></p>
+                        <p class="text-xs font-bold text-white truncate"><?php echo htmlspecialchars($_SESSION['name'] ?? 'Pharmacist'); ?></p>
                         <p class="text-[9px] font-black text-slate-500 uppercase tracking-tighter">Registered Pharmacist</p>
                     </div>
                     <a href="<?php echo $path; ?>../auth/logout.php" class="text-slate-500 hover:text-rose-500 transition-colors">
