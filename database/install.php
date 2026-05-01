@@ -295,7 +295,7 @@ VALUES ('System','Admin','admin','$defaultPassword',1)
 ============================= */
 file_put_contents("installed.lock","installed");
 
-/* Redirect to index */
-header("Location: ./config/config.php");
+/* Redirect to login */
+header("Location: ../modules/auth/login.php");
 exit();
 ?>

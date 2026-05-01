@@ -16,10 +16,10 @@ if (isset($_POST['submit'])) {
     } else {
 
         $stmt = $conn->prepare("
-            SELECT e.E_ID, e.E_Fname, e.username, e.password, r.role_name
+            SELECT e.E_ID, e.E_Fname, e.E_Username, e.E_Password, r.role_name
             FROM employee e
             LEFT JOIN roles r ON e.role_id = r.role_id
-            WHERE e.username = ?
+            WHERE e.E_Username = ?
             LIMIT 1
         ");
 
@@ -31,10 +31,10 @@ if (isset($_POST['submit'])) {
             if ($result && $result->num_rows === 1) {
                 $row = $result->fetch_assoc();
 
-                if (password_verify($password, $row['password'])) {
+                if (password_verify($password, $row['E_Password'])) {
 
                     $_SESSION['user'] = $row['E_ID'];
-                    $_SESSION['username'] = $row['username'];
+                    $_SESSION['username'] = $row['E_Username'];
                     $_SESSION['name'] = $row['E_Fname'];
                     $_SESSION['role'] = strtolower($row['role_name'] ?? 'admin'); // Defaulting to admin if role_name is null for now
                     $_SESSION['last_activity'] = time();

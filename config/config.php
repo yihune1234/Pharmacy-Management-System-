@@ -1,16 +1,36 @@
 <?php
-$host = "mysql-25712907-yihunebelay859-f8f5.h.aivencloud.com";
-$user = "avnadmin";
-$pass = getenv('DB_PASS');
-$db   = "pharmacy_db";
-$port = 25713;
+/*
+ * Database Configuration
+ * Supports both local development and environment-based production
+ */
 
+// Database credentials
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_USER', getenv('DB_USER') ?: 'root');
+define('DB_PASS', getenv('DB_PASS') ?: '');
+define('DB_NAME', getenv('DB_NAME') ?: 'pharmacy_db');
+define('DB_PORT', getenv('DB_PORT') ?: 3306);
+
+// Initialize connection
 $conn = mysqli_init();
-mysqli_ssl_set($conn, NULL, NULL, __DIR__ . "/ca.pem", NULL, NULL);
 
-if (!mysqli_real_connect($conn, $host, $user, $pass, $db, $port, NULL, MYSQLI_CLIENT_SSL)) {
-    die("Aiven Connection Failed: " . mysqli_connect_error());
+// Support SSL if CA certificate is present (for cloud DBs like Aiven)
+$ca_cert = __DIR__ . "/ca.pem";
+if (file_exists($ca_cert) && getenv('DB_SSL') === 'true') {
+    mysqli_ssl_set($conn, NULL, NULL, $ca_cert, NULL, NULL);
+    $connect_flags = MYSQLI_CLIENT_SSL;
+} else {
+    $connect_flags = 0;
 }
 
-echo "Connected to Aiven successfully!";
+// Connect to database
+if (!mysqli_real_connect($conn, DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, NULL, $connect_flags)) {
+    die("Database Connection Failed: " . mysqli_connect_error());
+}
+
+// Set charset to ensure proper encoding
+mysqli_set_charset($conn, "utf8mb4");
+
+// Optional: Echo connection status for debugging (Disable in production)
+// echo "Database Connected successfully!";
 ?>
