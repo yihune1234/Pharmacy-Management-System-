@@ -2,41 +2,134 @@
 require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../includes/alerts.php';
 require_once __DIR__ . '/../../includes/session_check.php';
+require_once __DIR__ . '/../../includes/pagination.php';
+require_once __DIR__ . '/../../includes/caching.php';
 
 // Validate admin access
 require_admin();
 validate_role_area('admin');
 
-// Get dashboard statistics
-$total_meds = $conn->query("SELECT COUNT(*) as count FROM meds")->fetch_assoc()['count'] ?? 0;
-$low_stock = $conn->query("SELECT COUNT(*) as count FROM meds WHERE Med_Qty <= 10")->fetch_assoc()['count'] ?? 0;
-$today_sales = $conn->query("SELECT COUNT(*) as count FROM sales WHERE S_Date = CURDATE()")->fetch_assoc()['count'] ?? 0;
-$today_revenue = $conn->query("SELECT COALESCE(SUM(Total_Amt), 0) as total FROM sales WHERE S_Date = CURDATE()")->fetch_assoc()['total'] ?? 0;
-$total_customers = $conn->query("SELECT COUNT(*) as count FROM customer")->fetch_assoc()['count'] ?? 0;
-$total_employees = $conn->query("SELECT COUNT(*) as count FROM employee")->fetch_assoc()['count'] ?? 0;
-$total_suppliers = $conn->query("SELECT COUNT(*) as count FROM suppliers")->fetch_assoc()['count'] ?? 0;
+// Initialize cache with 5-minute TTL for KPI metrics
+$cache = get_cache();
+$kpi_cache_ttl = 300; // 5 minutes
 
-// Recent sales
-$recent_sales = $conn->query("SELECT s.Sale_ID, s.S_Date, s.Total_Amt, c.C_Fname, c.C_Lname, e.E_Fname as emp_name 
-                             FROM sales s 
-                             LEFT JOIN customer c ON s.C_ID = c.C_ID 
-                             LEFT JOIN employee e ON s.E_ID = e.E_ID 
-                             ORDER BY s.Sale_ID DESC LIMIT 10");
+// Get dashboard statistics with caching
+// Cache key: dashboard_kpi_metrics
+$kpi_metrics = $cache->get('dashboard_kpi_metrics');
 
-// Top selling medicines
-$top_meds = $conn->query("SELECT m.Med_Name, SUM(si.Sale_Qty) as total_sold, SUM(si.Tot_Price) as revenue 
-                         FROM meds m 
-                         JOIN sales_items si ON m.Med_ID = si.Med_ID 
-                         JOIN sales s ON si.Sale_ID = s.Sale_ID 
-                         WHERE s.S_Date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-                         GROUP BY m.Med_ID, m.Med_Name 
-                         ORDER BY total_sold DESC LIMIT 5");
+if ($kpi_metrics === null) {
+    // KPI metrics not in cache, fetch from database
+    // Using prepared statements for security
+    
+    // Total medicines count - indexed on Med_ID
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM meds");
+    $stmt->execute();
+    $total_meds = $stmt->get_result()->fetch_assoc()['count'] ?? 0;
+    $stmt->close();
+    
+    // Low stock count - indexed on Med_Qty
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM meds WHERE Med_Qty <= 10");
+    $stmt->execute();
+    $low_stock = $stmt->get_result()->fetch_assoc()['count'] ?? 0;
+    $stmt->close();
+    
+    // Today's sales count - indexed on S_Date
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM sales WHERE S_Date = CURDATE()");
+    $stmt->execute();
+    $today_sales = $stmt->get_result()->fetch_assoc()['count'] ?? 0;
+    $stmt->close();
+    
+    // Today's revenue - indexed on S_Date and Total_Amt
+    $stmt = $conn->prepare("SELECT COALESCE(SUM(Total_Amt), 0) as total FROM sales WHERE S_Date = CURDATE()");
+    $stmt->execute();
+    $today_revenue = $stmt->get_result()->fetch_assoc()['total'] ?? 0;
+    $stmt->close();
+    
+    // Total customers - indexed on C_ID
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM customer");
+    $stmt->execute();
+    $total_customers = $stmt->get_result()->fetch_assoc()['count'] ?? 0;
+    $stmt->close();
+    
+    // Total employees - indexed on E_ID
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM employee");
+    $stmt->execute();
+    $total_employees = $stmt->get_result()->fetch_assoc()['count'] ?? 0;
+    $stmt->close();
+    
+    // Total suppliers - indexed on Sup_ID
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM suppliers");
+    $stmt->execute();
+    $total_suppliers = $stmt->get_result()->fetch_assoc()['count'] ?? 0;
+    $stmt->close();
+    
+    // Cache the KPI metrics
+    $kpi_metrics = [
+        'total_meds' => $total_meds,
+        'low_stock' => $low_stock,
+        'today_sales' => $today_sales,
+        'today_revenue' => $today_revenue,
+        'total_customers' => $total_customers,
+        'total_employees' => $total_employees,
+        'total_suppliers' => $total_suppliers
+    ];
+    $cache->set('dashboard_kpi_metrics', $kpi_metrics, $kpi_cache_ttl);
+} else {
+    // Use cached metrics
+    $total_meds = $kpi_metrics['total_meds'];
+    $low_stock = $kpi_metrics['low_stock'];
+    $today_sales = $kpi_metrics['today_sales'];
+    $today_revenue = $kpi_metrics['today_revenue'];
+    $total_customers = $kpi_metrics['total_customers'];
+    $total_employees = $kpi_metrics['total_employees'];
+    $total_suppliers = $kpi_metrics['total_suppliers'];
+}
 
-// Monthly trend data
-$monthly_sales = $conn->query("SELECT DATE_FORMAT(S_Date, '%Y-%m') as month, COUNT(*) as sales_count, SUM(Total_Amt) as revenue 
-                              FROM sales 
-                              WHERE S_Date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-                              GROUP BY month ORDER BY month ASC");
+// Pagination for recent sales
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$limit = 10;
+
+// Get total recent sales count - indexed on Sale_ID
+$stmt = $conn->prepare("SELECT COUNT(*) as count FROM sales");
+$stmt->execute();
+$total_sales = $stmt->get_result()->fetch_assoc()['count'] ?? 0;
+$stmt->close();
+
+$pagination = new Pagination($total_sales, $page, $limit);
+$offset = $pagination->get_offset();
+
+// Recent sales with pagination - using composite indexes on (S_Date, C_ID) and (S_Date, E_ID)
+$stmt = $conn->prepare("SELECT s.Sale_ID, s.S_Date, s.Total_Amt, c.C_Fname, c.C_Lname, e.E_Fname as emp_name 
+                        FROM sales s 
+                        LEFT JOIN customer c ON s.C_ID = c.C_ID 
+                        LEFT JOIN employee e ON s.E_ID = e.E_ID 
+                        ORDER BY s.Sale_ID DESC 
+                        LIMIT ? OFFSET ?");
+$stmt->bind_param("ii", $limit, $offset);
+$stmt->execute();
+$recent_sales = $stmt->get_result();
+$stmt->close();
+
+// Top selling medicines - using composite index on (Med_ID, Exp_Date)
+$stmt = $conn->prepare("SELECT m.Med_Name, SUM(si.Sale_Qty) as total_sold, SUM(si.Tot_Price) as revenue 
+                        FROM meds m 
+                        JOIN sales_items si ON m.Med_ID = si.Med_ID 
+                        JOIN sales s ON si.Sale_ID = s.Sale_ID 
+                        WHERE s.S_Date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+                        GROUP BY m.Med_ID, m.Med_Name 
+                        ORDER BY total_sold DESC LIMIT 5");
+$stmt->execute();
+$top_meds = $stmt->get_result();
+$stmt->close();
+
+// Monthly trend data - using index on S_Date
+$stmt = $conn->prepare("SELECT DATE_FORMAT(S_Date, '%Y-%m') as month, COUNT(*) as sales_count, SUM(Total_Amt) as revenue 
+                        FROM sales 
+                        WHERE S_Date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+                        GROUP BY month ORDER BY month ASC");
+$stmt->execute();
+$monthly_sales = $stmt->get_result();
+$stmt->close();
 
 $chart_labels = [];
 $chart_revenue = [];
@@ -223,6 +316,11 @@ while($row = $monthly_sales->fetch_assoc()) {
                     <?php endif; ?>
                 </tbody>
             </table>
+        </div>
+        
+        <!-- Pagination Controls -->
+        <div class="p-10 border-t border-slate-50 bg-slate-50/30">
+            <?php echo $pagination->generate_html('dashboard.php'); ?>
         </div>
     </div>
 

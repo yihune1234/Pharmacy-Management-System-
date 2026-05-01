@@ -110,6 +110,29 @@ $low_stock = $low_stock_result->fetch_assoc()['count'] ?? 0;
                         </div>
                     </div>
 
+                    <!-- Pharmacy Features Section -->
+                    <div>
+                        <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Pharmacy</p>
+                        <div class="space-y-1">
+                            <a href="<?php echo $path; ?>prescriptions/prescriptions.php" class="nav-link <?php echo (strpos($_SERVER['PHP_SELF'], 'prescriptions') !== false) ? 'nav-link-active' : ''; ?>">
+                                <i class="fas fa-file-medical text-lg"></i>
+                                <span class="font-semibold text-sm">Prescriptions</span>
+                            </a>
+                            <a href="<?php echo $path; ?>drug_interactions/checker.php" class="nav-link <?php echo (strpos($_SERVER['PHP_SELF'], 'drug_interactions') !== false) ? 'nav-link-active' : ''; ?>">
+                                <i class="fas fa-flask-vial text-lg"></i>
+                                <span class="font-semibold text-sm">Drug Interactions</span>
+                            </a>
+                            <a href="<?php echo $path; ?>inventory/expiry_management.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'expiry_management.php') ? 'nav-link-active' : ''; ?>">
+                                <i class="fas fa-calendar-times text-lg"></i>
+                                <span class="font-semibold text-sm">Expiry Management</span>
+                            </a>
+                            <a href="<?php echo $path; ?>sales/payment_methods.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'payment_methods.php') ? 'nav-link-active' : ''; ?>">
+                                <i class="fas fa-credit-card text-lg"></i>
+                                <span class="font-semibold text-sm">Payment Methods</span>
+                            </a>
+                        </div>
+                    </div>
+
                     <!-- Support Section -->
                     <div>
                         <p class="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Analysis</p>

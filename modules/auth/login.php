@@ -1,66 +1,122 @@
 <?php
 require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../config/security_enhanced.php';
 require_once __DIR__ . '/../../includes/alerts.php';
+require_once __DIR__ . '/../../includes/security_audit.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+$login_error = '';
+$rate_limit_error = '';
+
 if (isset($_POST['submit'])) {
-
-    $uname = trim($_POST['uname'] ?? '');
-    $password = trim($_POST['pwd'] ?? '');
-
-    if ($uname === '' || $password === '') {
-        set_flash_message("Please enter both username and password.", "error");
+    // Verify CSRF token
+    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash_message("Invalid security token. Please try again.", "error");
     } else {
+        $uname = trim($_POST['uname'] ?? '');
+        $password = trim($_POST['pwd'] ?? '');
+        $ip_address = get_client_ip();
 
-        $stmt = $conn->prepare("
-            SELECT e.E_ID, e.E_Fname, e.E_Username, e.E_Password, r.role_name
-            FROM employee e
-            LEFT JOIN roles r ON e.role_id = r.role_id
-            WHERE e.E_Username = ?
-            LIMIT 1
-        ");
+        if ($uname === '' || $password === '') {
+            set_flash_message("Please enter both username and password.", "error");
+        } else {
+            // Check rate limiting
+            $rate_limit_key = 'login_attempt_' . md5($ip_address);
+            if (!check_rate_limit($rate_limit_key, 10, 300)) {
+                $rate_limit_error = 'Too many login attempts. Please try again later.';
+                set_flash_message($rate_limit_error, "error");
+                log_security_event(0, 'rate_limit_exceeded', 'Login rate limit exceeded from IP: ' . $ip_address, $ip_address);
+            } else {
+                // Get user by username
+                $stmt = $conn->prepare("
+                    SELECT e.E_ID, e.E_Fname, e.E_Username, e.E_Password, r.role_name
+                    FROM employee e
+                    LEFT JOIN roles r ON e.role_id = r.role_id
+                    WHERE e.E_Username = ?
+                    LIMIT 1
+                ");
 
-        if ($stmt) {
-            $stmt->bind_param("s", $uname);
-            $stmt->execute();
-            $result = $stmt->get_result();
+                if ($stmt) {
+                    $stmt->bind_param("s", $uname);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
 
-            if ($result && $result->num_rows === 1) {
-                $row = $result->fetch_assoc();
+                    if ($result && $result->num_rows === 1) {
+                        $row = $result->fetch_assoc();
+                        $user_id = $row['E_ID'];
 
-                if (password_verify($password, $row['E_Password'])) {
+                        // Check if account is locked
+                        if (is_account_locked($user_id)) {
+                            $remaining_time = get_lockout_remaining_time($user_id);
+                            $minutes = ceil($remaining_time / 60);
+                            set_flash_message("Account locked due to multiple failed login attempts. Please try again in $minutes minutes.", "error");
+                            log_security_event($user_id, 'login_attempt_locked_account', 'Login attempt on locked account', $ip_address);
+                        } elseif (password_verify($password, $row['E_Password'])) {
+                            // Password correct
+                            reset_failed_login_attempts($user_id);
 
-                    $_SESSION['user'] = $row['E_ID'];
-                    $_SESSION['username'] = $row['E_Username'];
-                    $_SESSION['name'] = $row['E_Fname'];
-                    $_SESSION['role'] = strtolower($row['role_name'] ?? 'admin'); // Defaulting to admin if role_name is null for now
-                    $_SESSION['last_activity'] = time();
+                            // Check if 2FA is enabled
+                            $tfa_stmt = $conn->prepare("
+                                SELECT tfa_enabled FROM two_factor_auth 
+                                WHERE user_id = ? AND tfa_enabled = 1
+                            ");
+                            $tfa_stmt->bind_param("i", $user_id);
+                            $tfa_stmt->execute();
+                            $tfa_result = $tfa_stmt->get_result();
+                            $tfa_enabled = $tfa_result->num_rows > 0;
+                            $tfa_stmt->close();
 
-                    set_flash_message("Welcome back, " . htmlspecialchars($row['E_Fname']) . "!", "success");
+                            if ($tfa_enabled) {
+                                // Set pending 2FA state and redirect to 2FA verification
+                                $_SESSION['pending_2fa_user_id'] = $user_id;
+                                log_security_event($user_id, 'login_2fa_pending', 'User proceeding to 2FA verification', $ip_address);
+                                header("Location: 2fa_verify.php");
+                                exit();
+                            } else {
+                                // No 2FA, complete login directly
+                                $_SESSION['user'] = $user_id;
+                                $_SESSION['username'] = $row['E_Username'];
+                                $_SESSION['name'] = $row['E_Fname'];
+                                $_SESSION['role'] = strtolower($row['role_name'] ?? 'admin');
+                                $_SESSION['last_activity'] = time();
 
-                    switch ($_SESSION['role']) {
-                        case 'admin':
-                            header("Location: ../admin/dashboard.php");
-                            break;
-                        case 'pharmacist':
-                            header("Location: ../pharmacist/dashboard.php");
-                            break;
-                        case 'cashier':
-                            header("Location: ../cashier/dashboard.php");
-                            break;
-                        default:
-                            header("Location: ../admin/dashboard.php"); // Fallback
-                            break;
+                                set_flash_message("Welcome back, " . htmlspecialchars($row['E_Fname']) . "!", "success");
+                                log_security_event($user_id, 'login_success', 'User logged in successfully', $ip_address);
+
+                                switch ($_SESSION['role']) {
+                                    case 'admin':
+                                        header("Location: ../admin/dashboard.php");
+                                        break;
+                                    case 'pharmacist':
+                                        header("Location: ../pharmacist/dashboard.php");
+                                        break;
+                                    case 'cashier':
+                                        header("Location: ../cashier/dashboard.php");
+                                        break;
+                                    default:
+                                        header("Location: ../admin/dashboard.php");
+                                        break;
+                                }
+                                exit();
+                            }
+                        } else {
+                            // Password incorrect
+                            record_failed_login($user_id, $ip_address);
+                            set_flash_message("Invalid username or password. Please try again.", "error");
+                            log_security_event($user_id, 'login_failed', 'Failed login attempt', $ip_address);
+                        }
+                    } else {
+                        // User not found
+                        set_flash_message("Invalid username or password. Please try again.", "error");
+                        log_security_event(0, 'login_failed_unknown_user', 'Login attempt with unknown username: ' . $uname, $ip_address);
                     }
-                    exit();
+                    $stmt->close();
                 }
             }
         }
-
-        set_flash_message("Invalid username or password. Please try again.", "error");
     }
 }
 ?>
@@ -126,6 +182,8 @@ if (isset($_POST['submit'])) {
             </div>
 
             <form method="post" action="" class="space-y-8">
+                <?php echo csrf_token_input(); ?>
+                
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Authorized Personnel ID</label>
                     <div class="relative group">
