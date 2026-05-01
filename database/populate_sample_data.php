@@ -173,8 +173,9 @@ for ($i = 0; $i < 100; $i++) {
     $description = $action[1] . ' - Entry #' . ($i + 1);
     $date = date('Y-m-d H:i:s', strtotime('-' . rand(1, 720) . ' hours'));
     
+    $ip = '192.168.1.' . rand(1, 254);
     $conn->query("INSERT INTO activity_logs (user_id, action, description, ip_address, user_agent, created_at) 
-                  VALUES ($user_id, '{$action[0]}', '$description', '192.168.1.' . rand(1, 254), 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', '$date')");
+                  VALUES ($user_id, '{$action[0]}', '$description', '$ip', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', '$date')");
 }
 echo "✓ Inserted 100 activity logs<br>";
 
