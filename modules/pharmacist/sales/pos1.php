@@ -20,7 +20,7 @@ if (!$sid && isset($_POST['custadd'])) {
     if ($cid == "0") {
         set_flash_message("Please select a customer to proceed.", "warning");
     } else {
-        $qry = "INSERT INTO sales(c_id, e_id, s_date, s_time, total_amt) VALUES ('$cid', '$eid', CURDATE(), CURTIME(), 0)";
+        $qry = "INSERT INTO sales(C_ID, E_ID, S_Date, S_Time, Total_Amt) VALUES ('$cid', '$eid', CURDATE(), CURTIME(), 0)";
         if ($conn->query($qry)) {
             $sid = $conn->insert_id;
             header("Location: pos1.php?sid=" . $sid);
@@ -44,8 +44,8 @@ if (isset($_POST['add_item'])) {
     if ($stock_check['Med_Qty'] < $qty) {
         set_flash_message("Insufficient stock for " . $stock_check['Med_Name'] . ". Only " . $stock_check['Med_Qty'] . " left.", "error");
     } else {
-        $sql = "INSERT INTO sales_items(sale_id, med_id, sale_qty, tot_price) VALUES ('$sid', '$mid', '$qty', '$total')
-                ON DUPLICATE KEY UPDATE sale_qty = sale_qty + '$qty', tot_price = tot_price + '$total'";
+        $sql = "INSERT INTO sales_items(Sale_ID, Med_ID, Sale_Qty, Tot_Price) VALUES ('$sid', '$mid', '$qty', '$total')
+                ON DUPLICATE KEY UPDATE Sale_Qty = Sale_Qty + '$qty', Tot_Price = Tot_Price + '$total'";
         
         if ($conn->query($sql)) {
             set_flash_message("Added to order successfully!", "success");
@@ -61,7 +61,7 @@ if (isset($_POST['add_item'])) {
 $order_items = [];
 $order_total = 0;
 if ($sid) {
-    $res = $conn->query("SELECT si.*, m.Med_Name, m.Med_Price FROM sales_items si JOIN meds m ON si.med_id = m.Med_ID WHERE si.sale_id = '$sid'");
+    $res = $conn->query("SELECT si.*, m.Med_Name, m.Med_Price FROM sales_items si JOIN meds m ON si.Med_ID = m.Med_ID WHERE si.Sale_ID = '$sid'");
     while($row = $res->fetch_assoc()) {
         $order_items[] = $row;
         $order_total += $row['tot_price'];
@@ -211,11 +211,11 @@ if ($sid) {
                                 </td>
                                 <td class="px-6 py-5 text-slate-500 font-bold text-sm italic">Rs. <?php echo number_format($item['Med_Price'], 0); ?></td>
                                 <td class="px-6 py-5 text-center">
-                                    <span class="px-4 py-1.5 bg-slate-100 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest"><?php echo $item['sale_qty']; ?> UNIT</span>
+                                    <span class="px-4 py-1.5 bg-slate-100 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest"><?php echo $item['Sale_Qty']; ?> UNIT</span>
                                 </td>
-                                <td class="px-6 py-5 text-right font-black text-slate-900">Rs. <?php echo number_format($item['tot_price'], 0); ?></td>
+                                <td class="px-6 py-5 text-right font-black text-slate-900">Rs. <?php echo number_format($item['Tot_Price'], 0); ?></td>
                                 <td class="px-8 py-5 text-right">
-                                    <a href="delete_pos.php?mid=<?php echo $item['med_id']; ?>&sid=<?php echo $sid; ?>" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-400 flex items-center justify-center ml-auto hover:bg-rose-600 hover:text-white transition-all active:scale-90">
+                                    <a href="delete_pos.php?mid=<?php echo $item['Med_ID']; ?>&sid=<?php echo $sid; ?>" class="w-8 h-8 rounded-lg bg-rose-50 text-rose-400 flex items-center justify-center ml-auto hover:bg-rose-600 hover:text-white transition-all active:scale-90">
                                         <i class="fas fa-trash-alt text-xs"></i>
                                     </a>
                                 </td>
