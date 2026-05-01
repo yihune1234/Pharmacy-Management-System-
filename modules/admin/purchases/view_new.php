@@ -19,11 +19,15 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Purchase History - PHARMACIA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-50">
     <?php require('../sidebar.php'); ?>
 
-    <div class="mb-10 flex items-center justify-between">
+    <main class="flex-1 overflow-auto">
+        <div class="p-8">
+            <div class="mb-10 flex items-center justify-between">
         <div>
             <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Purchase History</h2>
             <p class="text-slate-500 mt-1 font-medium">View all stock purchases from suppliers</p>
@@ -176,10 +180,8 @@ $result = $conn->query($sql);
             window.open(`invoice.php?id=${purchaseId}`, '_blank', 'width=800,height=600');
         }
     </script>
-
-    <!-- Closing tags from sidebar.php -->
+        </div>
     </main>
-    </div>
     </div>
 </body>
 </html>

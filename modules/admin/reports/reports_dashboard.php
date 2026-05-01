@@ -54,12 +54,16 @@ $low_stock_alerts = $conn->query("
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Intelligence Console - PHARMACIA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-[#f8fafc]">
     <?php require('../sidebar.php'); ?>
 
-    <!-- Header Section -->
-    <div class="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+    <main class="flex-1 overflow-auto">
+        <div class="p-8">
+            <!-- Header Section -->
+            <div class="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
             <h2 class="text-xs font-black text-rose-600 uppercase tracking-widest mb-1">Visual Analysis</h2>
             <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Reports Dashboard</h1>
@@ -186,6 +190,7 @@ $low_stock_alerts = $conn->query("
     </div>
 
     <!-- Closing Sidebar Tags -->
+        </div>
     </main>
     </div>
     </div>
