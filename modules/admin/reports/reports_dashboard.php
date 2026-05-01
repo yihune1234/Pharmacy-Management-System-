@@ -77,6 +77,7 @@ $low_stock_alerts = $conn->query("
                 <i class="fas fa-file-excel mr-3 text-emerald-400"></i> Export Matrix
             </button>
         </div>
+        </div>
     </div>
 
     <!-- Core Metrics -->
