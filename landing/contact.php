@@ -318,7 +318,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="auth-buttons">
                     <a href="login.php" class="btn-login">Login</a>
-                    <a href="register.php" class="btn-register">Register as Guest</a>
+                    <a href="register.php" class="btn-register">Try Demo</a>
                 </div>
             </div>
         </div>

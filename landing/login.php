@@ -4,53 +4,71 @@ require_once __DIR__ . '/../config/config.php';
 
 $error = '';
 $success = '';
+$login_attempted = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $login_attempted = true;
     $username = htmlspecialchars($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
     if ($username && $password) {
-        // Query database for user
-        $stmt = $conn->prepare("SELECT E_ID, E_Fname, E_Username, E_Password, role_id FROM employee WHERE E_Username = ?");
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
+        try {
+            // Query database for user with role information
+            $stmt = $conn->prepare("
+                SELECT e.E_ID, e.E_Fname, e.E_Username, e.E_Password, e.role_id, r.role_name 
+                FROM employee e 
+                LEFT JOIN roles r ON e.role_id = r.role_id 
+                WHERE e.E_Username = ?
+            ");
             
-            // Verify password
-            if (password_verify($password, $user['E_Password'])) {
-                // Get role name
-                $role_stmt = $conn->prepare("SELECT role_name FROM roles WHERE role_id = ?");
-                $role_stmt->bind_param("i", $user['role_id']);
-                $role_stmt->execute();
-                $role_result = $role_stmt->get_result();
-                $role = $role_result->fetch_assoc();
-
-                // Create session
-                $_SESSION['user'] = $user['E_ID'];
-                $_SESSION['username'] = $user['E_Username'];
-                $_SESSION['name'] = $user['E_Fname'];
-                $_SESSION['role'] = $role['role_name'];
-                $_SESSION['last_activity'] = time();
-
-                // Redirect based on role
-                if ($role['role_name'] === 'admin') {
-                    header("Location: ../modules/admin/dashboard.php");
-                } elseif ($role['role_name'] === 'pharmacist') {
-                    header("Location: ../modules/pharmacist/dashboard.php");
-                } elseif ($role['role_name'] === 'cashier') {
-                    header("Location: ../modules/cashier/dashboard.php");
-                }
-                exit();
+            if (!$stmt) {
+                $error = 'Database error: ' . $conn->error;
             } else {
-                $error = 'Invalid username or password.';
+                $stmt->bind_param("s", $username);
+                $stmt->execute();
+                $result = $stmt->get_result();
+
+                if ($result->num_rows > 0) {
+                    $user = $result->fetch_assoc();
+                    
+                    // Verify password
+                    if (password_verify($password, $user['E_Password'])) {
+                        // Create session
+                        $_SESSION['user'] = $user['E_ID'];
+                        $_SESSION['username'] = $user['E_Username'];
+                        $_SESSION['name'] = $user['E_Fname'];
+                        $_SESSION['role'] = $user['role_name'] ?? 'admin';
+                        $_SESSION['role_id'] = $user['role_id'];
+                        $_SESSION['last_activity'] = time();
+
+                        // Redirect based on role
+                        $role = strtolower($user['role_name'] ?? 'admin');
+                        
+                        if ($role === 'admin') {
+                            header("Location: ../modules/admin/dashboard.php");
+                            exit();
+                        } elseif ($role === 'pharmacist') {
+                            header("Location: ../modules/pharmacist/dashboard.php");
+                            exit();
+                        } elseif ($role === 'cashier') {
+                            header("Location: ../modules/cashier/dashboard.php");
+                            exit();
+                        } else {
+                            // Default to admin if role is unknown
+                            header("Location: ../modules/admin/dashboard.php");
+                            exit();
+                        }
+                    } else {
+                        $error = 'Invalid username or password.';
+                    }
+                } else {
+                    $error = 'Invalid username or password.';
+                }
+                $stmt->close();
             }
-        } else {
-            $error = 'Invalid username or password.';
+        } catch (Exception $e) {
+            $error = 'Login error: ' . $e->getMessage();
         }
-        $stmt->close();
     } else {
         $error = 'Please enter both username and password.';
     }
@@ -253,6 +271,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #667eea;
         }
 
+        .demo-info code {
+            background: #e8ecff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #667eea;
+            font-weight: 600;
+        }
+
         @media (max-width: 480px) {
             .login-card {
                 padding: 30px 20px;
@@ -303,6 +330,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         name="username" 
                         placeholder="Enter your username"
                         required
+                        autofocus
                     >
                 </div>
 
@@ -327,13 +355,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <p class="register-link">
-                Don't have an account? <a href="register.php">Register as Guest</a>
+                Don't have an account? <a href="register.php">Try Demo</a>
             </p>
 
             <div class="demo-info">
                 <strong>Demo Credentials:</strong><br>
-                Username: <strong>admin</strong><br>
-                Password: <strong>admin123</strong>
+                <div style="margin-top: 10px; padding: 10px; background: white; border-radius: 5px;">
+                    <div style="margin-bottom: 8px;">
+                        <strong style="color: #667eea;">Admin Account:</strong><br>
+                        Username: <code>admin</code><br>
+                        Password: <code>admin123</code>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <strong style="color: #667eea;">Pharmacist Account:</strong><br>
+                        Username: <code>pharmacist</code><br>
+                        Password: <code>pharmacist123</code>
+                    </div>
+                    <div>
+                        <strong style="color: #667eea;">Cashier Account:</strong><br>
+                        Username: <code>cashier</code><br>
+                        Password: <code>cashier123</code>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
