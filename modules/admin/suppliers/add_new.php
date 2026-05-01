@@ -25,8 +25,11 @@ if (isset($_POST['add_supplier'])) {
         if ($check_result && $check_result->num_rows > 0) {
             set_flash_message("Supplier with this name or phone number already exists.", "error");
         } else {
-            $sql = "INSERT INTO suppliers (Sup_Name, Sup_Add, Sup_Phno, Sup_Mail, Contact_Person, Payment_Terms, Credit_Limit, Created_At) 
-                    VALUES ('$name', '$address', '$phone', '$email', '$contact_person', '$payment_terms', $credit_limit, CURRENT_TIMESTAMP)";
+            $rating = (float)($_POST['rating'] ?? 4.0);
+            $status = $conn->real_escape_string($_POST['status'] ?? 'Active');
+
+            $sql = "INSERT INTO suppliers (Sup_Name, Sup_Add, Sup_Phno, Sup_Mail, Contact_Person, Payment_Terms, Credit_Limit, Rating, Status, Created_At) 
+                    VALUES ('$name', '$address', '$phone', '$email', '$contact_person', '$payment_terms', $credit_limit, $rating, '$status', CURRENT_TIMESTAMP)";
             
             if ($conn->query($sql)) {
                 set_flash_message("Supplier '$name' added successfully!", "success");

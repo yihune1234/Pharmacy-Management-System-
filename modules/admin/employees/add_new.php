@@ -26,23 +26,27 @@ if (isset($_POST['add_employee'])) {
         $default_password = strtolower($fname) . '123';
         $hashed_password = password_hash($default_password, PASSWORD_DEFAULT);
         
+        // Mapping role to role_id
+        $role_map = ['Admin' => 1, 'Pharmacist' => 2, 'Manager' => 3, 'Cashier' => 4, 'Staff' => 5];
+        $role_id = $role_map[$role] ?? 5;
+
         // Check if username already exists
-        $check_sql = "SELECT E_ID FROM employee WHERE username = '$username'";
+        $check_sql = "SELECT E_ID FROM employee WHERE E_Username = '$username'";
         $check_result = $conn->query($check_sql);
         
         if ($check_result && $check_result->num_rows > 0) {
             $counter = 1;
             do {
                 $new_username = $username . $counter;
-                $check_sql = "SELECT E_ID FROM employee WHERE username = '$new_username'";
+                $check_sql = "SELECT E_ID FROM employee WHERE E_Username = '$new_username'";
                 $check_result = $conn->query($check_sql);
                 $counter++;
             } while ($check_result && $check_result->num_rows > 0);
             $username = $new_username;
         }
         
-        $sql = "INSERT INTO employee (E_Fname, E_Lname, E_Mail, E_Phno, E_Add, E_Type, E_Sal, username, password) 
-                VALUES ('$fname', '$lname', '$email', '$phone', '$address', '$position', $salary, '$username', '$hashed_password')";
+        $sql = "INSERT INTO employee (E_Fname, E_Lname, E_Mail, E_Phno, E_Add, E_Type, E_Sal, E_Username, E_Password, role_id) 
+                VALUES ('$fname', '$lname', '$email', '$phone', '$address', '$position', $salary, '$username', '$hashed_password', $role_id)";
         
         if ($conn->query($sql)) {
             $employee_id = $conn->insert_id;

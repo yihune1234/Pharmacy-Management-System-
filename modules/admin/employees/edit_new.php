@@ -159,7 +159,7 @@ if (isset($_POST['update_employee'])) {
                         
                         <div class="p-6 bg-white/5 rounded-3xl border border-white/10 border-dashed">
                              <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Access Credentials</p>
-                             <p class="text-white text-sm font-bold">Username: <span class="text-blue-400"><?php echo $employee['username']; ?></span></p>
+                             <p class="text-white text-sm font-bold">Username: <span class="text-blue-400"><?php echo $employee['E_Username']; ?></span></p>
                              <p class="text-slate-500 text-[10px] mt-2">Passwords are encrypted and cannot be displayed.</p>
                         </div>
                     </div>

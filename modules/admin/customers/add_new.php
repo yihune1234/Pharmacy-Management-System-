@@ -25,8 +25,11 @@ if (isset($_POST['add_customer'])) {
         if ($check_result && $check_result->num_rows > 0) {
             set_flash_message("Customer with this phone number or email already exists.", "error");
         } else {
-            $sql = "INSERT INTO customer (C_Fname, C_Lname, C_Age, C_Sex, C_Phno, C_Mail, C_Add) 
-                    VALUES ('$fname', '$lname', $age, '$sex', '$phone', '$email', '$address')";
+            $loyalty_tier = $conn->real_escape_string($_POST['loyalty_tier'] ?? 'Bronze');
+            $loyalty_points = (int)($_POST['loyalty_points'] ?? 0);
+
+            $sql = "INSERT INTO customer (C_Fname, C_Lname, C_Age, C_Sex, C_Phno, C_Mail, C_Add, Loyalty_Tier, Loyalty_Points) 
+                    VALUES ('$fname', '$lname', $age, '$sex', '$phone', '$email', '$address', '$loyalty_tier', $loyalty_points)";
             
             if ($conn->query($sql)) {
                 set_flash_message("Customer '$fname $lname' added successfully!", "success");
