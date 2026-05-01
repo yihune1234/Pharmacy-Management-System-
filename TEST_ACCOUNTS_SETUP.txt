@@ -1,0 +1,209 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    TEST ACCOUNTS SETUP GUIDE                              ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+🎯 QUICK SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. OPEN SETUP PAGE
+   URL: http://localhost/Pharmacy-Management-System-/database/setup_test_accounts.php
+
+2. CLICK "CREATE TEST ACCOUNTS" BUTTON
+   This will create three test accounts:
+   - Admin
+   - Pharmacist
+   - Cashier
+
+3. VERIFY ACCOUNTS CREATED
+   You'll see a table showing the status of each account
+
+4. LOGIN WITH TEST ACCOUNTS
+   Visit: http://localhost/Pharmacy-Management-System-/landing/login.php
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔐 TEST ACCOUNT CREDENTIALS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ADMIN ACCOUNT:
+  Username: admin
+  Password: admin123
+  Role: Administrator
+  Access: Full system access
+  Dashboard: /Pharmacy-Management-System-/modules/admin/dashboard.php
+
+PHARMACIST ACCOUNT:
+  Username: pharmacist
+  Password: pharmacist123
+  Role: Pharmacist
+  Access: POS, Inventory, Customers
+  Dashboard: /Pharmacy-Management-System-/modules/pharmacist/dashboard.php
+
+CASHIER ACCOUNT:
+  Username: cashier
+  Password: cashier123
+  Role: Cashier
+  Access: Sales, Customers, Receipts
+  Dashboard: /Pharmacy-Management-System-/modules/cashier/dashboard.php
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+�� SETUP PROCESS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Step 1: Access Setup Page
+  → http://localhost/Pharmacy-Management-System-/database/setup_test_accounts.php
+
+Step 2: Review Test Accounts
+  The page shows which accounts will be created:
+  ✓ Admin (admin / admin123)
+  ✓ Pharmacist (pharmacist / pharmacist123)
+  ✓ Cashier (cashier / cashier123)
+
+Step 3: Click "Create Test Accounts"
+  The system will:
+  ✓ Check if accounts already exist
+  ✓ Get role IDs from database
+  ✓ Hash passwords securely
+  ✓ Insert accounts into database
+  ✓ Display results
+
+Step 4: View Results
+  You'll see a table showing:
+  ✓ Username
+  ✓ Role
+  ✓ Status (Added/Skipped/Error)
+  ✓ Message
+
+Step 5: Login
+  Visit: http://localhost/Pharmacy-Management-System-/landing/login.php
+  Use any of the test credentials
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ FEATURES BY ROLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ADMIN FEATURES:
+  ✓ Inventory Management
+  ✓ Employee Management
+  ✓ Supplier Management
+  ✓ Advanced Reports
+  ✓ Security Settings
+  ✓ System Configuration
+  ✓ Alert Management
+  ✓ Audit Logs
+
+PHARMACIST FEATURES:
+  ✓ POS System
+  ✓ Drug Interactions
+  ✓ Prescriptions
+  ✓ Customer Profiles
+  ✓ Inventory Search
+  ✓ Refund Processing
+  ✓ Receipt Generation
+  ✓ Loyalty Points
+
+CASHIER FEATURES:
+  ✓ Process Sales
+  ✓ Payment Methods
+  ✓ Generate Receipts
+  ✓ Register Customers
+  ✓ Customer Lookup
+  ✓ Process Refunds
+  ✓ Transaction History
+  ✓ Daily Summary
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 WORKFLOW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. FIRST TIME SETUP:
+   → Visit setup page
+   → Click "Create Test Accounts"
+   → Accounts are created
+   → Go to login page
+
+2. LOGIN WITH ADMIN:
+   → Username: admin
+   → Password: admin123
+   → Redirected to Admin Dashboard
+   → Full system access
+
+3. LOGIN WITH PHARMACIST:
+   → Username: pharmacist
+   → Password: pharmacist123
+   → Redirected to Pharmacist Dashboard
+   → POS and inventory access
+
+4. LOGIN WITH CASHIER:
+   → Username: cashier
+   → Password: cashier123
+   → Redirected to Cashier Dashboard
+   → Sales and customer access
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ SECURITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ Passwords are hashed using PASSWORD_DEFAULT (Argon2ID)
+✓ Accounts are checked for duplicates before creation
+✓ Role IDs are validated from database
+✓ All inputs are properly sanitized
+✓ Database errors are handled gracefully
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 TESTING CHECKLIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+□ Setup page loads correctly
+□ "Create Test Accounts" button works
+□ Accounts are created successfully
+□ Admin login works and redirects to admin dashboard
+□ Pharmacist login works and redirects to pharmacist dashboard
+□ Cashier login works and redirects to cashier dashboard
+□ Each role has correct permissions
+□ Logout works correctly
+□ Can login again with same credentials
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📞 TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Issue: "Accounts already exist"
+  → Accounts were already created
+  → You can still login with the credentials
+  → Or delete accounts from database and recreate
+
+Issue: "Role not found"
+  → Roles table might be empty
+  → Run database migrations first
+  → Check roles table has admin, pharmacist, cashier
+
+Issue: "Database error"
+  → Check database connection
+  → Verify employee table exists
+  → Check database permissions
+
+Issue: Login not working
+  → Verify credentials are correct
+  → Check database connection
+  → Verify employee table has the accounts
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎉 READY TO TEST!
+
+1. Setup test accounts: 
+   http://localhost/Pharmacy-Management-System-/database/setup_test_accounts.php
+
+2. Login with test credentials:
+   http://localhost/Pharmacy-Management-System-/landing/login.php
+
+3. Test all roles and features!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
