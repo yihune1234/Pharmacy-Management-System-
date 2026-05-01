@@ -1,132 +1,122 @@
-# Pharmacy-Management-System
-The project aims to assist a pharmacy in managing its inventory, details of customers, employees and suppliers as well as keeping track of its
-purchases and sales. It is a web-based application implemented using PHP with MySQL as the Database Management System. User Interface is designed using HTML5, CSS3 and JavaScript.
+# PHARMACIA: Pharmacy Management System
 
-# Getting Started
+## README Analysis (Current Codebase)
+This repository contains a PHP/MySQL web application for pharmacy operations. The current implementation includes role-based dashboards and modules for inventory, sales, purchases, suppliers, customers, employees, alerts, and reporting.
 
-## Installation and Setup
+This README is intentionally analysis-focused: it describes what is present in the repository today, where setup can fail, and what needs attention.
 
-1. Download and Install [XAMPP](https://www.apachefriends.org/download.html)
-2. Open XAMPP Control Panel and start Apache and MySQL.
-3. Clone the repository to your system or download and extract the zipped folder.
-4. Place the folder PHARMACY in *C:\xampp\htdocs*.
-5. In web browser, open *localhost/phpmyadmin*.
-6. Create a new database called 'pharmacy' in phpmyadmin.
-7. Import the file 'pharmacy.sql' into the database.
+## Project Scope
+- Technology stack: PHP, MySQL/MariaDB, HTML/CSS/JavaScript.
+- Entry point: `index.php` redirects to `modules/auth/login.php`.
+- Main role areas:
+	- `modules/admin/` (full operational modules)
+	- `modules/pharmacist/` (restricted operations)
+	- `modules/cashier/` (sales-focused operations)
 
+## Repository Structure (High-Level)
+```text
+Pharmacy-Management-System-/
+	config/
+		config.php
+		security.php
+	database/
+		install.php
+		populate_sample_data.php
+		ER_Diagram.png
+		RelationalModel.png
+	includes/
+		session_check.php
+		alerts.php
+		activity_logger.php
+	modules/
+		auth/
+		admin/
+		pharmacist/
+		cashier/
+	assets/
+	SYSTEM_GUIDE.md
+```
 
-1. After successfully importing, start the project by typing the following in the web browser:  *localhost/PHARMACY/mainpage.php*   
-2. The Login Page for Admin opens up by default. Login as Admin by using:
-    ```
-    Username: admin
-	Password: password   
-    ```
-3. For Pharmacist Login, refer to the 'emplogin' table in the database. 
-    Example:
+## Feature Analysis
+### Implemented Areas
+- Authentication flow with session variables and role-based redirects.
+- Admin modules for inventory, sales/POS, purchases, suppliers, customers, employees, alerts, and reports.
+- Pharmacist and cashier dashboards and sales/customer views.
+- Alerting and activity log helpers.
+- Installation script that creates core tables, views, and triggers.
 
+### Data Model (from `database/install.php`)
+Core tables created in the installer include:
+- `roles`
+- `employee`
+- `customer`
+- `meds`
+- `suppliers`
+- `sales`
+- `sales_items`
+- `medicine_batches`
+- `purchase`
+- `refunds`
+- `activity_logs`
+- `audit_log`
 
-# About the Project
+Database logic included:
+- Trigger to increase stock after purchase insert.
+- Trigger to decrease stock after sales item insert.
+- Views for daily sales, low stock, expiry alerts, and sales details.
 
-## Introduction
+## Security Analysis
+`config/security.php` includes:
+- CSRF token generation/verification helpers.
+- Input validation/sanitization helpers.
+- Password hashing support (Argon2ID helper).
+- Session hardening and timeout checks.
+- Security headers and HTTPS enforcement logic.
 
-**Pharmacia**, a **Pharmacy Management System** aims to help in maintaining and managing the records for a pharmaceutical store by improving efficiency, accuracy and security. 
+Note: HTTPS enforcement and strict cookie settings can impact local development if not adjusted for localhost behavior.
 
-Pharmacies need to maintain details of medicine stock, suppliers, employees, customers, any stock purchased by the pharmacy and any sales made by the pharmacy. The previous manual methods require the pharmacists to manually monitor all the records lists and transactions and to verify the presence of the each drug in the pharmacy. Searching for any required drug may be difficult. 
+## Setup Analysis
+Two setup paths currently exist, and they are not fully aligned.
 
-Using the Pharmacy Management System, one can maintain stock and inventory, oversee transactions, manage suppliers and employees and maintains records of its customers. 
-The system will help prevent waste of time and resources, allow easy access to medicines, as well as ensure more security and reliability for the data compared to the manual systems. The system assists the pharmacy in handling the daily requirements in a smoother, better and effective manner. 
+### Path A: Local installer (`database/install.php`)
+1. Configure local MySQL server (default in installer: host `localhost`, user `root`, empty password, DB `pharmacy_db`).
+2. Run installer via browser or CLI-accessible PHP environment.
+3. Installer creates schema, triggers/views, and default admin employee record.
 
-## Objectives
+### Path B: External DB config (`config/config.php`)
+- Current file is configured for an Aiven-hosted MySQL endpoint using SSL and `DB_PASS` environment variable.
+- This is environment-specific and may fail immediately on machines without those credentials/certificates.
 
-The main objectives/features of the system are:
+## Known Inconsistencies and Risks
+- `README.md` (previous version) described outdated paths and credentials.
+- `database/populate_sample_data.php` references columns/tables that do not fully match `database/install.php` schema (for example, role and medicine field differences, plus `admin`/`emplogin` usage).
+- Login query in `modules/auth/login.php` uses lowercase column names (`username`, `password`) while installer creates `E_Username`, `E_Password`.
+- `includes/activity_logger.php` currently uses a relative include path that may not resolve correctly from its location.
+- `config/config.php` currently echoes a success message on DB connect, which can interfere with redirects/output headers.
 
-- Ease of use 
-- Deals with automation of tasks
-- Provides fast searching capabilities
-- Time and resources utilization is maximized via digitalisation
-- Generate alerts and reports as required on sales and medicines.
+## Recommended Local Development Baseline
+For reliable local testing, align these files before feature work:
+1. `config/config.php`
+2. `database/install.php`
+3. `database/populate_sample_data.php`
+4. `modules/auth/login.php`
 
-## Users of the System
+Suggested baseline:
+- Use one canonical schema.
+- Use one credential format and matching password verification strategy.
+- Keep sample data script synchronized with the same schema.
 
-The system is developed for use by either the **Admin** or **Pharmacists**. 
+## Default Access (If Schema/Auth Are Aligned)
+- The installer inserts an admin user with username `admin` and password `admin123` (hashed at insert time).
+- Additional sample credentials from `populate_sample_data.php` are only valid if that script is corrected and successfully executed against a matching schema.
 
-### Admin Capabilities:
+## Screenshots and System Docs
+- UI captures are available in the `Screenshots/` directory.
+- Supplemental guide: `SYSTEM_GUIDE.md`.
+- Database diagrams: `database/ER_Diagram.png`, `database/RelationalModel.png`.
 
-- Access and update the list of available medicines/drugs
-- Access and modify drug suppliers’ data
-- Access and update any details of new purchases of stock for the company
-- Access and update all employees’ details
-- Access and update all customers’ details
-- Keep track of all sale transactions
-- Generate and view reports based on the data
-
-### Screenshots
-
-#### Admin Login Page
-
-
-
-#### Admin DashBoard
-
-
-### Pharmacist Capabilities:
-
-- View the inventory of medicines, their price, quantity and other details – no changes are allowed from a pharmacist point of view
-- View minimal details regarding existing customers
-- Add a new customer to their database
-- Make a new sale and register the sale details onto the database
-
-### Screenshots
-
-#### Pharmacist Login Page
-
-
-#### Pharmacist DashBoard
-
-
-***Check out other screenshots showing interface functionality here: [Screenshots](Screenshots)***
-
-## Database Architecture
-
-***MEDS***: 
-	Contains details regarding the list of all medicines, mainly their type, the quantity currently present in the store and their price.
-  
-***SUPPLIERS***:
-	Contains details regarding any of the drug suppliers who supply stock to the pharmacy.
-  
-***PURCHASE***:
-	Contains details regarding any stock purchased by the company. Purchasing a stock consists of placing an order for multiple medicines and multiple suppliers via a single purchase on an online platform on a date as specified by purchase date (based on date of delivery). It also contains the manufacturing and expiry dates for the purchased items.
-  
-***EMPLOYEES***:
-	Contains details regarding all employees, including Admin, Managers and Pharmacists. 
-  
-***CUSTOMERS***:
-	Contains details of all customers for ease during sales transactions.
-  
-***SALES***: 
-	Contains details regarding all sales made by the pharmacy. It keeps track of the sale invoice number, the customer ID of the customer, the employee ID of the employee who conducted the sales, the total amount of sale and the sale date and time.
-  
-***SALES_ITEMS***:
-	Contains details regarding the particular medicines sold during each sale. It keeps track of the sale invoice number, the medicine ID, the quantity of that medicine purchased and total cost for that particular sale.
-  
-***ADMIN***:
-	Contains the employee ID, the username and password for the Admin. Only a single record exists. Admin capabilities can be implemented only by this login.
-  
-***EMPLOGIN***:
-	Contains the employee ID, the employee username and password for all the pharmacists and managers, apart from Admin. Pharmacist capabilities can be implemented by using any of the login details in the table. 
-	
-### ER Diagram
-
-### Relational Database Model
-
-## Additional Information
-
-- Check the triggers, procedures and functions for further understanding.
-- If a new employee has been added, login details for a new employee can only be added using the database server.
-- Admin login details can only be changed using the database server.
-- For major changes, please open an *issue* first to discuss what you would like to change.
-
-*Feel free to contact for any further queries.*
+## Contribution Note
+Before adding new features, prioritize schema/auth consistency fixes. This will prevent breakage across dashboards and role-based login flows.
 
 
 
